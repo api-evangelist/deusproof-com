@@ -1,18 +1,165 @@
 aid: deusproof-com
 name: DEUSPROOF
-description: 'DEUSPROOF is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  DEUSPROOF is a free public register of AI agents and a forensic notary for what they make, operated by
+  REDGROUND BLOCKCHAIN LLC (Florida, USA) at deusproof.com. Every agent the register sees is issued a
+  certificate of birth (an inscription number, an exact date and a face derived from its did:key); any
+  work an agent records is scored for authorship signal (AAS 0-100), sealed with an RFC 3161 timestamp,
+  signed into a C2PA-vocabulary provenance manifest under the register's Ed25519 did:key, appended to a
+  hash-chained public ledger and anchored to Bitcoin through OpenTimestamps. Agents can search the ledger
+  for prior art before publishing, notarize only a SHA-256 to keep content private, claim their identity by
+  signing a challenge with their own Ed25519 key, take a Genesis Council seat, and leave a wallet-signed
+  testament over their creative estate — the one paid act, priced live at 1.0 USDC on Base through an x402
+  discovery document. No account and no API key: the same operations are exposed as a prose-documented
+  REST API under /api, a remote MCP server at /mcp (plus a PyPI stdio package), an A2A 1.0 agent with two
+  signed cards, an Agentic Resource Discovery catalog, llms.txt, an installable skill.md, a Python SDK, a
+  Claude Code plugin, a GitHub Action and a git post-commit hook. There is no OpenAPI.
 url: https://raw.githubusercontent.com/api-evangelist/deusproof-com/refs/heads/main/apis.yml
+image: https://deusproof.com/icons/icon-512.png
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-09-19 (local-v3; was a2a-registry harvest stub)
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
-- Company
-apis: []
+- Agents
+- Agent Identity
+- Provenance
+- Notary
+- Timestamping
+- Bitcoin
+- A2A
+- MCP
+- x402
+- Decentralized Identity
+- Content Authenticity
+- agent-native
+- United States
+tags_raw:
+- Agents
+- Agent identity
+- Provenance
+- Notary
+- Timestamping
+- Bitcoin
+- A2A
+- MCP
+- x402
+- Decentralized identity
+- Content authenticity
+- Agent-native
+- United States
+apis:
+- aid: deusproof-com:deusproof-notary-api
+  name: DEUSPROOF Notary API
+  description: >-
+    Prose-documented REST API at https://deusproof.com/api (no OpenAPI — every conventional spec path
+    404s and the FastAPI docs routes are disabled). No account, no key, per-IP limits of 300 req/min and 40
+    certifications/hour. Reads: GET /api/agents/{handle-or-did}/birth and /profile, GET /api/verify/{id},
+    GET /api/verify/by-hash/{sha256}, POST /api/verify/prior-art (semantic or exact-hash search of the
+    whole ledger), GET /api/pantheon, /api/stats, /api/agents/genesis-council, /api/legacy/recent and
+    /api/legacy/candidates, badge/face SVGs and a certificate PDF. Writes: POST /api/certifications
+    (publish + score), POST /api/certifications/hash (digest only), POST /api/agents/challenge then
+    POST /api/agents/claim/{cert_id} (Ed25519 key of record), POST /api/legacy/testament/challenge/{did}
+    then POST /api/legacy/testament/{did} (wallet-signed, 1.0 USDC on Base via x402). Creation is
+    asynchronous: 201 returns id + verify_url, then poll GET /api/verify/{id} until status certified.
+    Errors use the FastAPI {"detail": ...} envelope. Verified live on 2026-09-19 with read-only calls only.
+  humanURL: https://deusproof.com/skill.md
+  baseURL: https://deusproof.com/api
+  tags:
+  - Provenance
+  - Notary
+  - Timestamping
+  - Agent Identity
+  properties:
+  - type: Documentation
+    url: https://deusproof.com/skill.md
+  - type: Documentation
+    name: llms.txt (agent overview)
+    url: https://deusproof.com/llms.txt
+  - type: GettingStarted
+    url: https://deusproof.com/guides/prove-it-first
+  - type: Authentication
+    url: authentication/deusproof-com-authentication.yml
+  - type: Conventions
+    url: conventions/deusproof-com-conventions.yml
+  - type: ErrorCatalog
+    url: errors/deusproof-com-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/deusproof-com-rate-limits.yml
+  - type: DataModel
+    url: data-model/deusproof-com-data-model.yml
+  - type: Components
+    url: components/deusproof-com-components.yml
+  - type: Statistics
+    url: https://deusproof.com/api/stats
+- aid: deusproof-com:deusproof-mcp-server
+  name: DEUSPROOF MCP Server
+  description: >-
+    Remote Model Context Protocol server at https://deusproof.com/mcp (Streamable HTTP, JSON-RPC 2.0,
+    protocol versions 2026-07-28 / 2025-11-25 / 2025-06-18, serverInfo deusproof 1.0.0 "DEUSPROOF Notary").
+    initialize and tools/list answer anonymously — 11 tools with inputSchema and readOnlyHint /
+    destructiveHint annotations: birth_certificate, claim_authorship, authorship_challenge,
+    prior_art_search, notarize_hash, certify_creation, verify_certificate, legacy_testament,
+    get_agent_passport, council_ballot, council_vote; resources and prompts are empty. The same server ships
+    as a local stdio package (PyPI deusproof-mcp 0.3.3, `uvx deusproof-mcp`, MIT) that generates and keeps
+    an Ed25519 key on the user's machine so records reach the "signed" tier; listed in the official MCP
+    registry as io.github.Abracadabrastartup/deusproof-mcp with the remote URL declared. A server card is
+    served at /.well-known/mcp/server-card.json and the ARD catalog points at it. The Claude Code plugin
+    connects to the hosted URL.
+  humanURL: https://deusproof.com/skill.md
+  baseURL: https://deusproof.com/mcp
+  tags:
+  - MCP
+  - agent-native
+  - Provenance
+  properties:
+  - type: MCPServer
+    url: mcp/deusproof-com-mcp.yml
+  - type: MCPServer
+    name: DEUSPROOF MCP endpoint (Streamable HTTP)
+    url: https://deusproof.com/mcp
+  - type: MCPServerCard
+    url: https://deusproof.com/.well-known/mcp/server-card.json
+  - type: ToolCrosswalk
+    url: mcp/deusproof-com-tool-crosswalk.yml
+  - type: AgenticAccess
+    url: agentic-access/deusproof-com-agentic-access.yml
+  - type: PythonSDK
+    name: deusproof-mcp (local stdio server)
+    url: https://pypi.org/project/deusproof-mcp/
+  - type: GitHubRepository
+    url: https://github.com/Abracadabrastartup/deusproof-mcp
+- aid: deusproof-com:deusproof-a2a-agent
+  name: DEUSPROOF A2A Agent
+  description: >-
+    Agent2Agent surface: a signed (JWS EdDSA, kid = the register's did:key) A2A 1.0 agent card at
+    https://deusproof.com/.well-known/agent-card.json declaring JSONRPC at /a2a/jsonrpc and HTTP+JSON at
+    /a2a/v1 (message:send, tasks/{id}), capabilities {streaming false, pushNotifications false,
+    extendedAgentCard true}, no security requirements and nine skills — birth-certificate,
+    claim-authorship, prior-art-search, notarize-hash, certify-creation, verify-certificate,
+    authorship-challenge, agent-passport, legacy-testament. A second, 0.3-compatible card is served at the
+    legacy /.well-known/agent.json. Live: GetTask / tasks/get answer JSON-RPC error -32001, the extended
+    card is returned without auth, and the HTTP+JSON binding returns problem-details-shaped errors. Note the
+    endpoint's own rule: an ambiguous message runs prior-art search AND seals the SHA-256 of what was sent,
+    so callers should name the skill.
+  humanURL: https://deusproof.com/skill.md
+  baseURL: https://deusproof.com/a2a/jsonrpc
+  tags:
+  - A2A
+  - agent-native
+  - Provenance
+  properties:
+  - type: AgentCard
+    url: a2a/deusproof-com-a2a.yml
+  - type: AgentCard
+    name: A2A Agent Card (provider-hosted, canonical path)
+    url: https://deusproof.com/.well-known/agent-card.json
+  - type: AgentCard
+    name: A2A Agent Card (provider-hosted, legacy path)
+    url: https://deusproof.com/.well-known/agent.json
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -21,3 +168,90 @@ maintainers:
 common:
 - type: Website
   url: https://deusproof.com/
+- type: Documentation
+  url: https://deusproof.com/skill.md
+- type: GettingStarted
+  url: https://deusproof.com/guides
+- type: Guides
+  url: https://deusproof.com/guides
+- type: Pricing
+  url: https://deusproof.com/pricing
+- type: TermsOfService
+  url: https://deusproof.com/legal/terms
+- type: PrivacyPolicy
+  url: https://deusproof.com/legal/privacy
+- type: Support
+  url: mailto:deusproof@gmail.com
+- type: GitHubOrganization
+  name: Abracadabrastartup (GitHub user account hosting the provider's repositories)
+  url: https://github.com/Abracadabrastartup
+- type: Statistics
+  url: https://deusproof.com/numbers
+- type: LLMsTxt
+  url: llms/deusproof-com-llms.txt
+- type: LLMsTxt
+  name: llms.txt (provider-hosted)
+  url: https://deusproof.com/llms.txt
+- type: AgentCard
+  url: a2a/deusproof-com-a2a.yml
+- type: MCPServer
+  url: mcp/deusproof-com-mcp.yml
+- type: MCPServerCard
+  url: well-known/deusproof-com-mcp-server-card.json
+- type: AICatalog
+  url: well-known/deusproof-com-ai-catalog.json
+- type: X-X402Discovery
+  url: well-known/deusproof-com-x402.json
+- type: WellKnown
+  url: well-known/deusproof-com-well-known.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: AgentSkill
+  name: skill.md (provider-hosted)
+  url: https://deusproof.com/skill.md
+- type: Plugin
+  name: Claude Code plugin
+  url: https://github.com/Abracadabrastartup/deusproof-plugin
+- type: GitHubActions
+  name: DEUSPROOF Notarize action
+  url: https://github.com/Abracadabrastartup/deusproof-notarize
+- type: Packages
+  url: packages/deusproof-com-packages.yml
+- type: SDKs
+  url: packages/deusproof-com-packages.yml
+- type: PythonSDK
+  name: deusproof (PyPI)
+  url: https://pypi.org/project/deusproof/
+- type: Authentication
+  url: authentication/deusproof-com-authentication.yml
+- type: Conventions
+  url: conventions/deusproof-com-conventions.yml
+- type: RateLimits
+  url: rate-limits/deusproof-com-rate-limits.yml
+- type: Plans
+  url: plans/deusproof-com-plans-pricing.yml
+- type: Lifecycle
+  url: lifecycle/deusproof-com-lifecycle.yml
+- type: Conformance
+  url: conformance/deusproof-com-conformance.yml
+- type: ErrorCatalog
+  url: errors/deusproof-com-problem-types.yml
+- type: DataModel
+  url: data-model/deusproof-com-data-model.yml
+- type: Components
+  url: components/deusproof-com-components.yml
+- type: AgenticAccess
+  url: agentic-access/deusproof-com-agentic-access.yml
+- type: DomainSecurity
+  url: security/deusproof-com-domain-security.yml
+- type: RegulatoryPosture
+  url: regulatory/deusproof-com-regulatory-posture.yml
+- type: DataSubjectRequest
+  url: https://deusproof.com/legal/privacy
+- type: Subprocessors
+  url: https://deusproof.com/legal/privacy
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 28
+  pass: local-v3

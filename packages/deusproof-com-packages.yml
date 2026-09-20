@@ -1,0 +1,106 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  Registry metadata read 2026-09-19 from pypi.org/pypi/<pkg>/json, registry.modelcontextprotocol.io,
+  api.github.com and the provider's own skill.md / llms.txt / repository READMEs. npm has no deusproof or
+  deusproof-mcp package (registry.npmjs.org 404 for both). The GitHub presence is a USER account,
+  Abracadabrastartup (4 public repos), not an organization; the provider names it itself in the MCP
+  registry id io.github.Abracadabrastartup/deusproof-mcp.
+package_count: 6
+official_count: 6
+packages:
+- language: python
+  kind: sdk
+  registry: pypi
+  name: deusproof
+  url: https://pypi.org/project/deusproof/
+  install: pip install deusproof
+  official: true
+  version: 0.2.0
+  published: '2026-09-16'
+  first_published: '2026-07-11'
+  releases: 5
+  license: MIT
+  requires_python: '>=3.9'
+  summary: Prove your AI agent's work existed at a given moment — one call, self-signed, timestamped and Bitcoin-anchored on a public append-only register. Free.
+  keywords: [ai-agents, provenance, notary, did, bitcoin, c2pa, langchain]
+  usage: 'from deusproof import Notary; Notary(handle=..., model=...).certify(prompt=..., output=...) -> proof.verify_url / proof.badge_markdown; certify(..., sign=True) is the default (Ed25519 did:key kept at ~/.deusproof/)'
+  source: null
+  note: project_urls name only Homepage and Pantheon; the MCP registry points its repository at github.com/Abracadabrastartup/deusproof, which returns 404 (private or removed), so no public source repository is recorded for the SDK.
+- language: python
+  kind: mcp-server
+  registry: pypi
+  name: deusproof-mcp
+  url: https://pypi.org/project/deusproof-mcp/
+  install: uvx deusproof-mcp
+  alt_install: pip install deusproof-mcp && deusproof-mcp
+  official: true
+  version: 0.3.3
+  published: '2026-09-15'
+  first_published: '2026-07-12'
+  releases: 12
+  license: MIT
+  requires_python: '>=3.10'
+  source: https://github.com/Abracadabrastartup/deusproof-mcp
+  source_pushed: '2026-09-15'
+  summary: Local stdio MCP server; generates an Ed25519 key on the user's machine and signs records (the "signed" tier). Same tool set as the hosted https://deusproof.com/mcp.
+  note: pyproject pins mcp>=1.2.0,<2 after a documented seven-week breakage under mcp 2.x.
+- language: null
+  kind: mcp-registry-listing
+  registry: mcp-registry
+  name: io.github.Abracadabrastartup/deusproof-mcp
+  url: https://registry.modelcontextprotocol.io/v0/servers/io.github.Abracadabrastartup%2Fdeusproof-mcp/versions/latest
+  official: true
+  version: 0.3.3
+  published: '2026-09-18'
+  first_published: '2026-07-13'
+  releases: 11
+  transport: stdio (pypi deusproof-mcp 0.3.3) + remote streamable-http https://deusproof.com/mcp
+  status: active
+  note: The official MCP registry entry; isLatest true on 0.3.3. Remotes[] has carried the hosted URL since 0.1.6 (2026-08-04).
+- language: null
+  kind: claude-code-plugin
+  registry: claude-code-marketplace
+  name: deusproof
+  url: https://github.com/Abracadabrastartup/deusproof-plugin
+  install: '/plugin marketplace add Abracadabrastartup/deusproof-plugin && /plugin install deusproof@deusproof'
+  official: true
+  version: 1.0.0
+  published: '2026-08-22'
+  license: MIT
+  source: https://github.com/Abracadabrastartup/deusproof-plugin
+  author: REDGROUND BLOCKCHAIN LLC
+  summary: Claude Code plugin — two slash commands (/prior-art, /notarize), the prove-it-first skill, and .mcp.json pointing at the hosted MCP server. Nothing runs locally.
+  note: version from .claude-plugin/plugin.json; published is the repository's last push (no marketplace metadata endpoint to query).
+- language: shell
+  kind: github-action
+  registry: github-marketplace
+  name: Abracadabrastartup/deusproof-notarize
+  url: https://github.com/Abracadabrastartup/deusproof-notarize
+  install: 'uses: Abracadabrastartup/deusproof-notarize@v1'
+  official: true
+  version: v1
+  published: '2026-07-24'
+  source: https://github.com/Abracadabrastartup/deusproof-notarize
+  summary: Composite GitHub Action; mode content (POST /api/certifications) or mode hash (POST /api/certifications/hash, only a SHA-256 leaves the runner; with no file the commit fingerprint sha256("deusproof-commit:"+sha) is notarized). Fail-soft by default; outputs verify-url, certificate-id, output-hash.
+  note: '"v1" is the tag the README instructs; the repository API exposes no release list, and published is the last push date. Listed on the GitHub Marketplace (a validation fork exists under actions-marketplace-validations).'
+- language: shell
+  kind: git-hook
+  registry: cdn
+  name: deusproof git post-commit hook
+  url: https://deusproof.com/git/install.sh
+  install: 'curl -fsSL https://deusproof.com/git/install.sh | sh'
+  official: true
+  version: null
+  published: null
+  hook: https://deusproof.com/git/post-commit
+  summary: Installs a fail-soft post-commit hook that notarizes sha256("deusproof-commit:"+commit) via POST /api/certifications/hash; honours core.hooksPath and DEUSPROOF_BASE_URL.
+  note: Served unversioned from the provider host (HTTP 200, application/x-sh, 1,769 bytes on 2026-09-19); floats to whatever is live, so a consumer cannot pin it either — version null is the finding.
+searched:
+- {registry: npm, query: 'https://registry.npmjs.org/deusproof', status: 404}
+- {registry: npm, query: 'https://registry.npmjs.org/deusproof-mcp', status: 404}
+- {registry: pypi, query: 'https://pypi.org/pypi/deusproof/json', status: 200}
+- {registry: pypi, query: 'https://pypi.org/pypi/deusproof-mcp/json', status: 200}
+- {registry: mcp-registry, query: 'https://registry.modelcontextprotocol.io/v0/servers?search=deusproof', status: 200, result: '11 versions of one server'}
+- {registry: github, query: 'https://api.github.com/users/Abracadabrastartup', status: 200, result: 'User account, 4 public repos: deusproof-mcp, deusproof-plugin, deusproof-notarize (+ one not visible)'}
+- {registry: github, query: 'https://api.github.com/repos/Abracadabrastartup/deusproof', status: 404, note: 'the SDK repository the MCP registry names is not public'}

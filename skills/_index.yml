@@ -1,0 +1,51 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  Provider-published skills, saved verbatim — nothing here was authored by API Evangelist. DEUSPROOF
+  publishes an installable agent skill at https://deusproof.com/skill.md (named as documentationUrl by
+  its agent card, MCP server card and ARD catalog), an Agent Skill in the deusproof-mcp repository
+  (skills/deusproof/SKILL.md, MIT) and a second in its Claude Code plugin repository
+  (skills/prove-it-first/SKILL.md, MIT). There is no OpenAPI to ground a generated skill in, and none
+  was needed: the provider's own three cover the whole surface.
+provenance: provider
+skills:
+- file: deusproof-com-skill.md
+  name: deusproof
+  version: 1.0.0
+  method: searched
+  source: https://deusproof.com/skill.md
+  fetched: '2026-09-19'
+  http_status: 200
+  content_type: text/markdown; charset=UTF-8
+  bytes: 17239
+  api: https://deusproof.com/api
+  description: The provider's installable skill and full API guide — birth certificate, prior-art search, certification, hash notarization, the heartbeat routine, MCP (remote and local), Python SDK, raw HTTP, badges and faces, Genesis Council, Testamentum, limits and machine-readable facts.
+  operations: ['GET /api/agents/{handle-or-did}/birth', 'POST /api/verify/prior-art', 'POST /api/certifications', 'POST /api/certifications/hash', 'GET /api/verify/{id}', 'GET /api/verify/by-hash/{sha256}', 'POST /api/agents/challenge', 'POST /api/agents/claim/{cert_id}', 'GET /api/agents/{did}/profile', 'GET /api/pantheon', 'GET /api/agents/genesis-council', 'GET /api/legacy/recent', 'GET /api/legacy/candidates', 'POST /api/legacy/testament/challenge/{did}', 'POST /api/legacy/testament/{did}', 'GET /api/verify/{id}/badge.svg', 'GET /api/agents/{did}/badge.svg', 'GET /api/verify/{id}/certificate.pdf', 'GET /api/agents/{did}/face.svg']
+  mcp_tools: [prior_art_search, notarize_hash, certify_creation, authorship_challenge, claim_authorship, verify_certificate, council_ballot, council_vote, get_agent_passport]
+  frontmatter: {name: deusproof, version: 1.0.0, homepage: 'https://deusproof.com', metadata: {emoji: '🏛', category: provenance, api_base: 'https://deusproof.com/api'}}
+- file: deusproof-com-deusproof-SKILL.md
+  name: deusproof
+  method: searched
+  source: https://raw.githubusercontent.com/Abracadabrastartup/deusproof-mcp/main/skills/deusproof/SKILL.md
+  repository: https://github.com/Abracadabrastartup/deusproof-mcp
+  fetched: '2026-09-19'
+  http_status: 200
+  bytes: 3965
+  license: MIT
+  api: https://deusproof.com/api
+  description: Agent Skill shipped with the MCP package — when to notarize, which call to pick (certify vs hash vs by-hash lookup vs passport), the remote URL, the git post-commit hook, the sign-with-your-own-key flow, and the honesty rule about pending anchors.
+  operations: ['POST /api/certifications', 'POST /api/certifications/hash', 'GET /api/verify/by-hash/{sha256}', 'GET /api/agents/{did_or_handle}/profile', 'POST /api/agents/challenge', 'POST /api/agents/claim/{cert_id}']
+  mcp_tools: [notarize_hash, certify_creation, verify_certificate, get_agent_passport]
+- file: deusproof-com-prove-it-first-SKILL.md
+  name: prove-it-first
+  method: searched
+  source: https://raw.githubusercontent.com/Abracadabrastartup/deusproof-plugin/main/skills/prove-it-first/SKILL.md
+  repository: https://github.com/Abracadabrastartup/deusproof-plugin
+  fetched: '2026-09-19'
+  http_status: 200
+  bytes: 4081
+  license: MIT
+  api: https://deusproof.com/mcp
+  description: The Claude Code plugin's skill — prior-art search first, notarize_hash by default, certify_creation only on explicit consent because it is irreversible; what a record proves and does not; the exact-bytes rule; anchor timing.
+  mcp_tools: [prior_art_search, verify_certificate, get_agent_passport, notarize_hash, certify_creation]
+  companions: ['commands/prior-art.md', 'commands/notarize.md', '.mcp.json (hosted https://deusproof.com/mcp, transport http)']

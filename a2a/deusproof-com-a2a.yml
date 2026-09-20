@@ -1,0 +1,127 @@
+generated: '2026-09-19'
+method: probed
+source: https://deusproof.com/.well-known/agent-card.json
+card:
+  file: deusproof-com-agent-card.json
+  name: DEUSPROOF
+  url: https://deusproof.com/a2a/jsonrpc
+  version: 1.0.0
+  protocol_version: '1.0'
+  skills: 9
+  provider:
+    organization: DEUSPROOF
+    url: https://deusproof.com
+  documentation_url: https://deusproof.com/skill.md
+  interfaces:
+  - {url: 'https://deusproof.com/a2a/jsonrpc', protocolBinding: JSONRPC, protocolVersion: '1.0'}
+  - {url: 'https://deusproof.com/a2a/v1', protocolBinding: HTTP+JSON, protocolVersion: '1.0'}
+  capabilities: {streaming: false, pushNotifications: false, extendedAgentCard: true}
+  security: 'securityRequirements: [{schemes: {}}] — no authentication; the endpoint GET says "none — free, no account"'
+  signed: true
+  signature_kid: did:key:z6MkjQKbLhrmBFHVjSGcLw5K32Cb4zJL9tSb7Uqfzu2MH1eL
+  signature_note: >-
+    JWS (EdDSA) over the card, kid = the register's own did:key — the same key that signs every
+    certificate's provenance manifest (signature_info.issuer on GET /api/verify/{id}) and that
+    the ARD catalog names as host.identifier. Signature not verified by this pipeline.
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: deusproof.com
+  note: >-
+    Served from the apex host, which is also the REST API host (/api), the MCP host (/mcp) and the A2A
+    host (/a2a). www.deusproof.com 301s every /.well-known/* path to the apex. The 200 is a served
+    document and not a catch-all: every other well-known path (security.txt, openid-configuration,
+    oauth-*, api-catalog, apis.json, aauth-resource.json, ucp.json, acp.json) and a negative-control
+    path that cannot exist all return a real HTTP 404 (the Next.js not-found page). The provider ALSO
+    serves the pre-0.3 legacy path /.well-known/agent.json with a second, differently-shaped card —
+    recorded below. Ownership is not in question: provider.organization is "DEUSPROOF" with
+    provider.url https://deusproof.com, the card is signed with the register's own did:key, the MCP
+    server card names the same repository, and the Terms of Use name the operator (REDGROUND
+    BLOCKCHAIN LLC, Florida, USA).
+conformance:
+  spec: A2A 1.0.0
+  grade: flavored
+  grade_rule: api-search/network/scripts/lib_agent_card.py grade_agent_card (capabilities object + top-level protocolVersion + skills array)
+  protocol_version: '1.0'
+  preferred_transport: JSONRPC
+  deviations:
+  - no-protocolVersion
+  - supportedInterfaces-instead-of-additionalInterfaces
+  observation: >-
+    The canonical card declares protocolVersion "1.0" INSIDE each supportedInterfaces[] entry
+    (protocolBinding + protocolVersion per interface) and carries no top-level protocolVersion, url or
+    preferredTransport. That is the A2A 1.0 AgentCard shape (supportedInterfaces replaced url /
+    preferredTransport / additionalInterfaces); the rubric's hard check reads the 0.3.x top-level
+    field, so the card grades flavored under the rules as written. capabilities IS an object and skills
+    IS an array of 9. The grade is recorded as the rules produce it; the shape difference is noted so
+    a rubric revision can decide whether a per-interface protocolVersion satisfies the check.
+  optional_fields_present: [defaultInputModes, defaultOutputModes, documentationUrl, iconUrl, provider, signatures]
+legacy_card:
+  file: deusproof-com-agent-card-legacy.json
+  path: /.well-known/agent.json
+  canonical: false
+  http_status: 200
+  content_type: application/json
+  bytes: 7430
+  grade: conformant
+  deviations: [supportedInterfaces-instead-of-additionalInterfaces]
+  note: >-
+    A second card, byte-different from the canonical one, served at the pre-0.3 path. It carries
+    top-level protocolVersion "1.0", url https://deusproof.com/a2a/jsonrpc and preferredTransport
+    JSONRPC IN ADDITION to the same supportedInterfaces[], capabilities object, 9 skills and a separate
+    JWS signature — i.e. the 0.3-compatible projection of the same card. It grades conformant under
+    the same rules. Saved verbatim alongside the canonical card.
+endpoint_verification:
+  - url: https://deusproof.com/a2a/jsonrpc
+    method: GET
+    http_status: 200
+    content_type: application/json
+    body_summary: >-
+      {"service":"DEUSPROOF over A2A","protocolVersion":"1.0","agentCard":".../.well-known/agent-card.json",
+      "interfaces":{"JSONRPC":{"methods":["SendMessage","GetTask"]},"HTTP+JSON":{"send":".../a2a/v1/message:send",
+      "getTask":".../a2a/v1/tasks/{id}"}},"auth":"none — free, no account","skills":[9 ids]}
+    note: >-
+      The endpoint's own note says an ambiguous message runs prior-art search AND seals the SHA-256 of
+      what was sent — a message/send is therefore a WRITE to the append-only ledger and was NOT issued
+      by this pipeline. Only read-only task lookups and the extended-card method were exercised.
+  - url: https://deusproof.com/a2a/jsonrpc
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"GetTask","params":{"id":"apievangelist-nonexistent-probe"}}'
+    http_status: 200
+    response: '{"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"task id must be a UUID."}}'
+    note: A live JSON-RPC 2.0 responder; the same answer for the 0.3 method name tasks/get.
+  - url: https://deusproof.com/a2a/jsonrpc
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"agent/getAuthenticatedExtendedCard","params":{}}'
+    http_status: 200
+    response: 'result = the full agent card (also answered under the 1.0 method name GetExtendedAgentCard)'
+    note: capabilities.extendedAgentCard true is honoured; no authentication was required to read it.
+  - url: https://deusproof.com/a2a/v1/tasks/apievangelist-nonexistent-probe
+    method: GET
+    http_status: 400
+    content_type: application/json
+    response: '{"code":3,"message":"task id must be a UUID.","details":[],"type":"https://a2a-protocol.org/errors/-32602","title":"task id must be a UUID.","status":400,"detail":"task id must be a UUID.","error":{"code":-32602,"message":"task id must be a UUID."}}'
+    note: The HTTP+JSON binding answers with a problem-details-shaped body (type/title/status/detail) plus a gRPC-style code and the JSON-RPC error, served as application/json rather than application/problem+json.
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://deusproof.com/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  body_bytes: 7333
+  body_parses_as: JSON object with AgentCard shape (name, description, version, provider, documentationUrl, iconUrl, supportedInterfaces, capabilities, defaultInputModes, defaultOutputModes, securityRequirements, skills, signatures)
+  corroborating_probes:
+  - {url: 'https://deusproof.com/.well-known/agent.json', http_status: 200, note: 'legacy card, saved as deusproof-com-agent-card-legacy.json'}
+  - {url: 'https://www.deusproof.com/.well-known/agent-card.json', http_status: 301, note: 'redirects to the apex'}
+  - {url: 'https://deusproof.com/.well-known/apievangelist-negative-control-7f3a9c.json', http_status: 404, note: 'negative control — the host does not answer 200 for arbitrary well-known paths'}
+  - {url: 'https://deusproof.com/.well-known/ai-catalog.json', http_status: 200, note: 'Agentic Resource Discovery catalog listing this card and the MCP server card (well-known/)'}
+  - {url: 'https://a2aregistry.org', note: 'The card was first seen as one of 415 agents listed on a2aregistry.org (fetched 2026-09-19, author "DEUSPROOF"), which is how this provider entered the harvest backlog. The listing was the lead; the card was fetched from the provider host.'}
+skills:
+- {id: birth-certificate, name: Your own entry in the register, write: false}
+- {id: claim-authorship, name: Take possession of your identity with your own key, write: true}
+- {id: prior-art-search, name: Search the ledger for prior art, write: false}
+- {id: notarize-hash, name: Notarize a fingerprint without revealing content, write: true}
+- {id: certify-creation, name: Record a creation on the public ledger, write: true}
+- {id: verify-certificate, name: Verify a certificate, write: false}
+- {id: authorship-challenge, name: Get a challenge to sign, write: false}
+- {id: agent-passport, name: Look up an agent's public record, write: false}
+- {id: legacy-testament, name: Leave a testament over your creative estate, write: false, note: 'returns terms only; sealing is a separate paid REST call'}

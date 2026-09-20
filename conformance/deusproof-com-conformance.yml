@@ -1,0 +1,134 @@
+generated: '2026-09-19'
+method: searched
+source: https://deusproof.com/.well-known/agent-card.json
+derived_from: [a2a/deusproof-com-agent-card.json, mcp/deusproof-com-mcp-tools.json, well-known/deusproof-com-ai-catalog.json, well-known/deusproof-com-x402.json, 'live GET https://deusproof.com/api/verify/21b4bc78-9bb0-4de7-aa27-0db050c5d374']
+docs:
+- https://deusproof.com/skill.md
+- https://deusproof.com/guides/what-a-certificate-proves
+- https://deusproof.com/accountability
+summary: >-
+  DEUSPROOF's conformance profile is the agent-protocol stack plus the provenance/timestamping standards
+  of its own market, and — unusually — most of it is observable in the CONTENT of live responses rather
+  than claimed on a page: a certificate returned by GET /api/verify/{id} carries an RFC 3161 TSA source
+  and verification flag, an Ed25519 did:key issuer, a detached manifest in the C2PA 2.x assertion
+  vocabulary (self-described as "not a trust-listed C2PA credential"), IPTC digitalSourceType URIs and
+  OpenTimestamps anchor calendars. The agent card is A2A 1.0-shaped and signed (JWS EdDSA); the MCP server
+  speaks 2025-06-18; the well-known surface adds an Agentic Resource Discovery catalog and an x402 v1
+  discovery document. There is no OAuth/OIDC, no RFC 9116 security.txt, no RFC 9727 api-catalog, no
+  OpenAPI, and the provider states in its own words that "nothing here is compliance" — no certification or
+  regulatory conformance is claimed, so no Compliance pointer is emitted.
+standards:
+- id: a2a
+  name: Agent2Agent protocol
+  version: '1.0'
+  conforms: true
+  evidence: >-
+    a2a/deusproof-com-agent-card.json — supportedInterfaces[] with protocolBinding JSONRPC and HTTP+JSON,
+    each protocolVersion "1.0"; capabilities object; 9 skills; JWS signature. Live: POST /a2a/jsonrpc
+    GetTask answered JSON-RPC error -32001; GET /a2a/v1/tasks/{id} answered a problem-details-shaped 400
+    with type https://a2a-protocol.org/errors/-32602; agent/getAuthenticatedExtendedCard returned the card.
+  grade: flavored under the catalog's 0.3-era hard check (no top-level protocolVersion); the legacy /.well-known/agent.json card grades conformant. See a2a/deusproof-com-a2a.yml.
+- id: mcp
+  name: Model Context Protocol
+  version: '2025-06-18'
+  conforms: true
+  evidence: 'POST https://deusproof.com/mcp initialize -> protocolVersion "2025-06-18", serverInfo {deusproof, 1.0.0}, capabilities.tools.listChanged false; tools/list -> 11 tools each with inputSchema and annotations (readOnlyHint/destructiveHint/openWorldHint); the GET self-description advertises 2026-07-28, 2025-11-25 and 2025-06-18.'
+- id: mcp-server-card
+  name: MCP server card at /.well-known/mcp/server-card.json
+  conforms: true
+  evidence: well-known/deusproof-com-mcp-server-card.json — name, title, version, websiteUrl, documentationUrl, repository, remotes[streamable-http], tools[11].
+- id: ard
+  name: Agentic Resource Discovery catalog (/.well-known/ai-catalog.json)
+  version: '1.0'
+  conforms: true
+  evidence: well-known/deusproof-com-ai-catalog.json — specVersion 1.0, host.identifier did:key, entries[] typed application/mcp-server-card+json and application/a2a-agent-card+json with representativeQueries.
+- id: json-rpc-2.0
+  conforms: true
+  evidence: Both /mcp and /a2a/jsonrpc answer {"jsonrpc":"2.0", ...}; A2A error -32001 and -32602 codes observed.
+- id: x402
+  name: x402 HTTP payment protocol
+  version: 'x402Version 1'
+  conforms: true
+  verification: partial
+  evidence: well-known/deusproof-com-x402.json — resources[] naming POST /api/legacy/testament/{did}, scheme exact-direct, network base, USDC asset contract, amount 1.0, pay_to; skill.md describes the flow as "x402-style, exact-direct". The 402 challenge on the paid route was not exercised (it is a write); recorded on the served discovery document.
+- id: caip-2
+  conforms: partial
+  evidence: The x402 document names the network as "base" (not the CAIP-2 form eip155:8453) and the asset by contract address.
+- id: rfc3161
+  name: RFC 3161 Time-Stamp Protocol
+  conforms: true
+  domain_standard_signature: true
+  evidence: 'GET /api/verify/21b4bc78-... -> tsa_source "https://freetsa.org/tsr", tsa_verified true; birth certificate appearance.timestamp_authority "https://freetsa.org/tsr"; privacy page names freetsa.org and DigiCert as timestamp authorities; every page footer says "RFC 3161 timestamped".'
+- id: opentimestamps
+  name: OpenTimestamps Bitcoin anchoring
+  conforms: true
+  domain_standard_signature: true
+  evidence: 'verify response anchor_status pending_btc|confirmed_btc, anchor_calendars[3], anchor_block_height; birth certificate bitcoin_block 961417; skill.md: "download the .ots proof from your verify page and confirm it at opentimestamps.org".'
+- id: did-key
+  name: W3C did:key method (Ed25519, multibase z6Mk)
+  conforms: true
+  domain_standard_signature: true
+  evidence: 'Every agent identity and the register itself are did:key identifiers (agent_did, signature_info.issuer did:key:z6MkjQKb...); the agent card JWS kid is the same did:key; challenge-response claim is signed with the agent''s Ed25519 key.'
+- id: c2pa
+  name: C2PA content credentials
+  version: c2pa-2.x-assertions
+  conforms: partial
+  domain_standard_signature: true
+  claimed: 'C2PA-style / C2PA assertion format'
+  evidence: >-
+    verify response c2pa_manifest.spec: manifest_version 1.0, assertion_vocabulary "c2pa-2.x-assertions",
+    trust_list_validated false, signature_algorithm "Ed25519 (did:key)", manifest_kind "ed25519-signed
+    provenance manifest (C2PA assertion format; not a trust-listed C2PA credential)"; assertions include
+    c2pa.actions with action c2pa.created and digitalSourceType
+    http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia. A detached JSON manifest in
+    the C2PA assertion vocabulary, not an embedded JUMBF manifest signed by a trust-listed certificate —
+    the provider says so itself, so partial is the honest grade.
+- id: iptc-digital-source-type
+  name: IPTC Digital Source Type vocabulary
+  conforms: true
+  evidence: c2pa.actions assertion carries http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia.
+- id: w3c-verifiable-credentials
+  name: W3C Verifiable Credentials
+  conforms: false
+  claimed: true
+  evidence: '/accountability and /numbers state a birth certificate "can also be issued as a W3C Verifiable Credential"; no endpoint or example VC is documented in skill.md or llms.txt and none was observed. Recorded as claimed, unverified.'
+- id: rfc9457
+  name: RFC 9457 Problem Details
+  conforms: partial
+  evidence: 'The A2A HTTP+JSON binding returned {"type":"https://a2a-protocol.org/errors/-32602","title":...,"status":400,"detail":...} — the problem-details members — as application/json, not application/problem+json. The REST /api surface uses the FastAPI {"detail": "..."} envelope (observed 401, 404, 405, 422), which is not RFC 9457.'
+- id: rfc9116
+  name: security.txt
+  conforms: false
+  evidence: '/.well-known/security.txt and /security.txt both 404.'
+- id: rfc9727
+  name: API catalog (/.well-known/api-catalog)
+  conforms: false
+  evidence: 404.
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata
+  conforms: false
+  evidence: '/.well-known/oauth-protected-resource 404; the MCP server has no auth to declare.'
+- id: oauth2
+  conforms: false
+  evidence: No OAuth anywhere; no authorization-server metadata; identity is key-based challenge-response.
+- id: oidc
+  conforms: false
+  evidence: '/.well-known/openid-configuration 404.'
+- id: openapi
+  conforms: false
+  evidence: 'No OpenAPI/Swagger at /openapi.json, /openapi.yaml, /swagger.json, /api/openapi.json, /api/docs, /api/redoc, /docs, /redoc (all 404); the FastAPI docs routes are disabled. The REST API is documented only in prose.'
+- id: llms-txt
+  conforms: true
+  evidence: https://deusproof.com/llms.txt 200 text/plain (llms/deusproof-com-llms.txt); no llms-full.txt.
+- id: agent-skills
+  name: Agent Skills (SKILL.md with frontmatter)
+  conforms: true
+  evidence: skills/_index.yml — /skill.md plus two repository SKILL.md files with name/description frontmatter.
+- id: regulatory
+  conforms: false
+  claimed: false
+  evidence: >-
+    The provider disclaims it explicitly: "Does registering an AI agent satisfy the EU AI Act? No. Nothing
+    on this site satisfies any law, nobody has certified or approved this register, and recording an agent
+    here is not compliance with the AI Act or with anything else." (/accountability). No SOC 2 / ISO 27001 /
+    PCI claims anywhere. No Compliance pointer.

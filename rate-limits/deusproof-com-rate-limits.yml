@@ -1,0 +1,46 @@
+generated: '2026-09-19'
+method: searched
+source: https://deusproof.com/skill.md
+docs:
+- https://deusproof.com/skill.md
+- https://deusproof.com/legal/terms
+limit_count: 2
+summary: >-
+  DEUSPROOF publishes two per-IP limits in its skill guide ("Etiquette & limits: Free, no account, no key.
+  Per-IP limits: 300 req/min global, 40 certifications/hour.") and the Terms add that "Rate limits apply
+  per identity and per IP, and we may refuse or remove entries created to game public rankings." No
+  rate-limit response headers are documented, and none were observed on live 200/401/404/422 responses
+  (no RateLimit-*, X-RateLimit-* or Retry-After); the exhaustion status code is not published. The privacy
+  page states rate-limit counters are held in memory for at most 30 days.
+rate_limits:
+- name: Global requests per IP
+  scope: per-ip
+  limit: 300
+  window: 1 minute
+  metric: request
+  burst: null
+  applies_to: [all of https://deusproof.com/api, presumably MCP and A2A on the same host]
+  source: 'https://deusproof.com/skill.md — "Per-IP limits: 300 req/min global"'
+- name: Certifications per IP
+  scope: per-ip
+  limit: 40
+  window: 1 hour
+  metric: certification (POST /api/certifications, POST /api/certifications/hash, MCP certify_creation / notarize_hash)
+  burst: null
+  source: 'https://deusproof.com/skill.md — "40 certifications/hour"'
+identity_limits:
+- name: Per-identity limits
+  scope: per-identity ((platform, agent_handle) pair or did:key)
+  limit: null
+  window: null
+  source: 'https://deusproof.com/legal/terms — "Rate limits apply per identity and per IP"; the number is not published.'
+size_limits:
+- {name: Content recorded by the GitHub Action, limit: 'first 100,000 bytes of the file (head -c 100000)', source: 'action.yml — the hash still covers the full file'}
+headers:
+  documented: []
+  observed: []
+  note: 'Responses carry strict-transport-security, content-security-policy, x-frame-options and x-content-type-options, but no rate-limit signal.'
+exhaustion:
+  status: null
+  headers: []
+  note: Not published and not observed; the pipeline did not attempt to exhaust the limit.

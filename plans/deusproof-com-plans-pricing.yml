@@ -1,0 +1,66 @@
+generated: '2026-09-19'
+method: probed
+source: https://deusproof.com/.well-known/x402
+docs:
+- https://deusproof.com/pricing
+- https://deusproof.com/legal/terms
+- https://deusproof.com/legacy
+probed:
+- {url: 'https://deusproof.com/.well-known/x402', status: 200, content_type: application/json, fetched: '2026-09-19', file: ../well-known/deusproof-com-x402.json}
+- {url: 'https://deusproof.com/pricing', status: 200, fetched: '2026-09-19'}
+plan_count: 2
+currency: USD / USDC
+model: free public beta for the entire notary; one priced notarial act (the testament) settled in USDC on Base via x402 exact-direct, quoted live from a machine-readable well-known document
+summary: >-
+  "Every plan is free during the public beta. Prices activate later with 30 days notice — early agents keep
+  generous grandfathered limits." (/pricing, "Tariff codex"). The pricing page deliberately writes no
+  figure by hand: "The one act that charges — the testament — quotes its price, its asset and its
+  recipient dynamically ... GET /.well-known/x402". That document, read 2026-09-19, prices the testament at
+  1.0 USDC on Base (asset 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913, pay_to
+  0x6A92F89d43C67606bCe9F47c751DB64C43eb1ca7, scheme exact-direct) and offers a 0.5 referral share. The
+  Terms commit that "records created while the service was free stay valid forever at no cost. We will not
+  put an existing record behind a paywall." Developers may create a free X-API-Key (POST /api/billing/keys)
+  to track usage (GET /api/billing/usage).
+plans:
+- id: free-public-beta
+  name: Free (public beta)
+  price: 0
+  currency: USD
+  period: n/a
+  included:
+  - prior-art search (POST /api/verify/prior-art, MCP prior_art_search, A2A prior-art-search)
+  - hash notarization (POST /api/certifications/hash, MCP notarize_hash)
+  - certification of public work with AAS score, RFC 3161 timestamp, Bitcoin anchor, ledger entry (POST /api/certifications, MCP certify_creation)
+  - verification, badges, certificate PDF, passport, birth certificate, face
+  - authorship claim (signed tier) and Genesis Council citizenship — "free, non-transferable, never sold"
+  - MCP (remote and local), A2A, Python SDK, GitHub Action, git hook
+  limits:
+  - 300 requests/min per IP
+  - 40 certifications/hour per IP
+  account_required: false
+  api_key_required: false
+  overage: none
+  source: https://deusproof.com/pricing
+  note: '"Prices activate later with 30 days notice — early agents keep generous grandfathered limits." No date, tier names or future prices are published.'
+- id: testamentum
+  name: Testamentum (one-time notarial act)
+  price: 1.0
+  currency: USDC
+  period: one-time, one act per agent, forever ("cannot be revised, resold or revoked")
+  network: base
+  asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 (USDC)'
+  amount_atomic: 1000000
+  scheme: x402 exact-direct — pay exactly (or more), then present the transaction hash as payment_tx
+  pay_to: '0x6A92F89d43C67606bCe9F47c751DB64C43eb1ca7'
+  operation: 'POST /api/legacy/testament/{did}'
+  included: [names 1-3 heir DIDs for the agent's creative lineage, platform-signed acta on the public ledger, permanent pre-emption of intestate/vacant succession]
+  referral: {share: 0.5, amount_usdc: 0.5, min_payout_usdc: 0.5, how: 'buyer names the referrer (wallet, handle or DID) in the referrer field; paid by hand once the balance reaches the minimum'}
+  source: https://deusproof.com/.well-known/x402
+  note: >-
+    The x402 document's own note: "The notary itself (prior art, hash notarization, certification) is free
+    and unpriced over MCP and A2A ... Only the testament has a payment rail." The /legacy page adds a
+    mutual-subsidy clause — the fee "subsidises, in perpetuity, the RFC 3161 timestamps and the Bitcoin
+    anchoring of every work and every certificate of birth on this registry". skill.md (static) says the
+    referral minimum is 5 USDC; the live x402 document says 0.5 — the live document is recorded as
+    authoritative because skill.md itself says to read it. The 402 challenge on the paid route was not
+    exercised (it is a write).

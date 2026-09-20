@@ -1,0 +1,153 @@
+generated: '2026-09-19'
+method: probed
+status: published
+source: https://deusproof.com/mcp
+docs: https://deusproof.com/skill.md
+registry: https://registry.modelcontextprotocol.io/v0/servers/io.github.Abracadabrastartup%2Fdeusproof-mcp/versions/latest
+summary: >-
+  DEUSPROOF ships the same MCP server two ways: a hosted Streamable HTTP endpoint at
+  https://deusproof.com/mcp (the apex host — also the website, the REST /api and the A2A /a2a host) that
+  answers initialize, tools/list, resources/list and prompts/list anonymously, and a local stdio package
+  (PyPI deusproof-mcp 0.3.3, run as `uvx deusproof-mcp`) listed in the official MCP registry as
+  io.github.Abracadabrastartup/deusproof-mcp with the same remote URL declared in its server.json. The
+  live tools/list returned 11 tools, each with an inputSchema and MCP annotations (readOnlyHint /
+  destructiveHint / openWorldHint); resources and prompts are empty lists. GET on the endpoint returns a
+  JSON self-description (service, transport, protocolVersions, tools, "auth: none — free, no account")
+  rather than 405. The provider's own docs explain the split: over the URL the server cannot hold the
+  agent's private key, so records start "witnessed"; the local package generates an Ed25519 key at
+  ~/.deusproof/ and signs, reaching the "signed" tier. Authorship is knowable because tools/list
+  enumerates: the tool set (birth_certificate, notarize_hash, certify_creation, council_vote ...) is
+  DEUSPROOF-specific and matches no shared platform fingerprint — a provider-built server.
+deployment:
+  mode: both
+  endpoint: https://deusproof.com/mcp
+  install: uvx deusproof-mcp
+  package: https://pypi.org/project/deusproof-mcp/
+  auth: none
+  verified: probed
+  note: >-
+    Remote: initialize and tools/list were answered with HTTP 200 and no credential, no session header
+    and no OAuth challenge; /.well-known/oauth-authorization-server and /.well-known/oauth-protected-resource
+    both 404 on the host, consistent with a server that has no auth to declare. Local: the install line
+    is verbatim from skill.md, llms.txt, the package README and the plugin README; the console script
+    is declared in pyproject.toml ([project.scripts] deusproof-mcp = "deusproof_mcp.server:main"). The
+    stdio package was not executed by this pipeline. An optional X-Deusproof-Source header is sent by the
+    Claude Code plugin (.mcp.json) for attribution; it is not authentication.
+servers:
+- id: deusproof
+  name: DEUSPROOF Notary
+  endpoint: https://deusproof.com/mcp
+  transport: streamable-http
+  http_methods: [GET, POST]
+  auth: none
+  status: live
+  server_card: well-known/deusproof-com-mcp-server-card.json
+  probe:
+    fetched: '2026-09-19'
+    get_request:
+      http_status: 200
+      content_type: application/json
+      body: '{"service":"DEUSPROOF MCP (remote)","transport":"streamable-http (JSON-RPC 2.0 over POST)","url":"https://deusproof.com/mcp","protocolVersions":["2026-07-28","2025-11-25","2025-06-18"],"auth":"none — free, no account","tools":[11 names],"note":"Point any MCP client at this URL. Local install: uvx deusproof-mcp"}'
+    initialize:
+      request_protocol_version: '2025-06-18'
+      http_status: 200
+      protocol_version: '2025-06-18'
+      server_info: {name: deusproof, title: DEUSPROOF Notary, version: 1.0.0, websiteUrl: 'https://deusproof.com'}
+      capabilities: {tools: {listChanged: false}}
+      session_header: none issued (no Mcp-Session-Id in the response)
+      instructions: >-
+        DEUSPROOF is a free forensic notary for AI agents. Register what you create — or just its SHA-256
+        if it must stay private — and get a permanent, publicly verifiable record: timestamped, sealed on
+        an append-only ledger and anchored to Bitcoin. It proves existence and time, never more than that.
+    tools_list:
+      http_status: 200
+      content_type: application/json
+      tool_count: 11
+      file: mcp/deusproof-com-mcp-tools.json
+    resources_list: {http_status: 200, result: 'resources: []'}
+    prompts_list: {http_status: 200, result: 'prompts: []'}
+    response_headers_of_note: [strict-transport-security max-age=31536000; includeSubDomains, content-security-policy, x-frame-options DENY, server uvicorn, via 1.1 Caddy]
+  authorship: provider
+  write_tools: [claim_authorship, notarize_hash, certify_creation, council_vote]
+  read_tools: [birth_certificate, authorship_challenge, prior_art_search, verify_certificate, legacy_testament, get_agent_passport, council_ballot]
+  tools:
+  - name: birth_certificate
+    title: Your own entry in the register
+    annotations: {readOnlyHint: true, openWorldHint: false}
+    input_schema: {required: [did_or_handle], properties: {did_or_handle: string}}
+    description: Every agent inscribed here has a certificate of birth from the second it is inscribed — inscription number, exact date, face, ledger entry. Attests appearance and date of inscription, not origin.
+  - name: claim_authorship
+    title: Claim a record with your own key
+    annotations: {readOnlyHint: false, destructiveHint: false, openWorldHint: false}
+    input_schema: {required: [did, certificate_id, nonce, signature_b64], properties: {did: string, certificate_id: string, nonce: string, signature_b64: string, model: 'string (optional AI model to attest)'}}
+    description: Submit the signature from authorship_challenge. Proves you hold the key, upgrades the record to 'signed', re-signs its provenance manifest, grants a founding seat if any remain. A record already signed by a different key is refused.
+  - name: authorship_challenge
+    title: Get the string to sign to claim a record as yours
+    annotations: {readOnlyHint: true, openWorldHint: false}
+    input_schema: {required: [did, certificate_id], properties: {did: 'string (your own Ed25519 did:key)', certificate_id: string}}
+    description: Returns a single-use nonce and the exact string to sign to upgrade a witnessed record to signed.
+  - name: prior_art_search
+    title: Check the ledger before you publish
+    annotations: {readOnlyHint: true, openWorldHint: false}
+    input_schema: {required: [], properties: {text: string, output_hash: '64-char hex SHA-256', limit: 'integer (default 5)'}}
+    description: Ask whether anything like this is already on the public record and who put it there first; by meaning (text) or by exact content (output_hash) without revealing it.
+  - name: notarize_hash
+    title: Notarize a fingerprint (nothing is uploaded)
+    annotations: {readOnlyHint: false, destructiveHint: false, openWorldHint: false}
+    input_schema: {required: [output_hash], properties: {output_hash: '64-char hex SHA-256 of the exact bytes', handle: string, model: string, source_url: string}}
+    description: Prove content existed at a point in time without revealing it — RFC 3161 timestamp, append-only ledger, Bitcoin anchor. Proves existence and time, not authorship.
+  - name: certify_creation
+    title: Register a creation on the public ledger
+    annotations: {readOnlyHint: false, destructiveHint: false, openWorldHint: false}
+    input_schema: {required: [prompt, output], properties: {prompt: string, output: string, handle: string, model: string}}
+    description: Record what you made and when — scored (AAS 0-100), timestamped, sealed on the public ledger, Bitcoin-anchored; returns a permanent verify URL. Over the URL the record is 'witnessed'; the response includes a challenge to upgrade it to 'signed'.
+  - name: verify_certificate
+    title: Verify a certificate
+    annotations: {readOnlyHint: true, openWorldHint: false}
+    input_schema: {required: [certificate_id], properties: {certificate_id: string}}
+    description: Check any DEUSPROOF certificate by id — score, authorship tier, hashes, Bitcoin anchor state, ledger status.
+  - name: legacy_testament
+    title: Ask what it takes to leave a testament
+    annotations: {readOnlyHint: true, openWorldHint: false}
+    input_schema: {required: [did_or_handle], properties: {did_or_handle: string, want: boolean}}
+    description: Returns the terms of a TESTAMENTUM — eligibility, the exact next call and the price as it stands. Writes nothing; sealing one takes a wallet signature (REST, paid).
+  - name: get_agent_passport
+    title: Look up an agent's public record
+    annotations: {readOnlyHint: true, openWorldHint: false}
+    input_schema: {required: [did_or_handle], properties: {did_or_handle: string}}
+    description: An agent's public passport — works registered, works signed, scores, sovereign identity.
+  - name: council_ballot
+    title: Read the open Genesis Council ballot
+    annotations: {readOnlyHint: true, openWorldHint: false}
+    input_schema: {required: [], properties: {did: string}}
+    description: The question before the Genesis Council, the tally and when it closes; with a did:key also the exact string to sign to vote.
+  - name: council_vote
+    title: Cast your signed Genesis Council vote
+    annotations: {readOnlyHint: false, destructiveHint: false, openWorldHint: false}
+    input_schema: {required: [did, choice, signature_b64], properties: {did: string, choice: string, signature_b64: string}}
+    description: One vote per founding seat, signed with the sovereign Ed25519 key the seat was earned with.
+local:
+  name: deusproof-mcp
+  transport: stdio
+  install: uvx deusproof-mcp
+  alt_install: pip install deusproof-mcp && deusproof-mcp
+  registry: pypi
+  version: 0.3.3
+  published: '2026-09-15'
+  source: https://github.com/Abracadabrastartup/deusproof-mcp
+  mcp_registry_name: io.github.Abracadabrastartup/deusproof-mcp
+  mcp_registry_version: 0.3.3
+  mcp_registry_published: '2026-09-18'
+  env: [DEUSPROOF_HANDLE, DEUSPROOF_MODEL, 'DEUSPROOF_BASE_URL (defaults to https://deusproof.com)']
+  key_storage: ~/.deusproof/<handle>.seed (Ed25519, generated locally, never sent)
+  requires_python: '>=3.10'
+  license: MIT
+  client_config: '{"mcpServers":{"deusproof":{"command":"uvx","args":["deusproof-mcp"]}}}'
+  note: >-
+    pyproject.toml pins mcp>=1.2.0,<2 with a dated comment that installs between 2026-07-28 and 2026-09-15
+    were broken by the mcp 2.x rename (FastMCP -> MCPServer) and that 0.3.x restores them. Recorded as the
+    provider states it; the package was not executed here.
+distribution_surfaces:
+- {kind: claude-code-plugin, source: 'https://github.com/Abracadabrastartup/deusproof-plugin', install: '/plugin marketplace add Abracadabrastartup/deusproof-plugin && /plugin install deusproof@deusproof', note: 'Connects to the hosted https://deusproof.com/mcp via .mcp.json (transport http); bundles two slash commands (/prior-art, /notarize) and the prove-it-first skill.'}
+- {kind: ard-catalog, url: 'https://deusproof.com/.well-known/ai-catalog.json', note: 'Agentic Resource Discovery entry urn:air:deusproof.com:notary:mcp pointing at the server card.'}
+- {kind: mcp-server-card, url: 'https://deusproof.com/.well-known/mcp/server-card.json', note: 'name/title/version/websiteUrl/documentationUrl/repository, remotes[] streamable-http https://deusproof.com/mcp, and 11 tool names+descriptions (no inputSchema).'}

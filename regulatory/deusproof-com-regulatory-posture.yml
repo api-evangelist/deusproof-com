@@ -1,0 +1,83 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://deusproof.com/legal/privacy
+probed:
+- {url: 'https://deusproof.com/legal/privacy', status: 200, fetched: '2026-09-19'}
+- {url: 'https://deusproof.com/legal/terms', status: 200, fetched: '2026-09-19'}
+- {url: 'https://deusproof.com/accountability', status: 200, fetched: '2026-09-19'}
+- {url: 'https://deusproof.com/numbers', status: 200, fetched: '2026-09-19'}
+- {url: 'https://deusproof.com/.well-known/security.txt', status: 404}
+- {url: 'https://deusproof.com/security.txt', status: 404}
+summary: >-
+  A two-person-scale service with plain-language legal pages ("Written in plain language by the people who
+  run the service ... It has not yet been reviewed by a lawyer"). Two horizontal signals carry substance: a
+  documented removal/correction channel with a stated scope of what can and cannot be removed, and a named
+  list of the third parties that receive data. The site cites the EU AI Act and a US executive order as
+  the PROBLEM it addresses and disclaims any compliance claim in the same breath, so no AI-regime
+  conformance is recorded. No accessibility statement, SBOM, transparency report (the /numbers page is
+  register statistics, not a DSA-style report), data-residency statement, support-lifetime commitment or
+  age-assurance mechanism was found; the privacy page says only that the service "is not directed at
+  children". Not probed for GPC because the regime rule forbids inferring it from a header.
+signals:
+  data_subject_request:
+    url: https://deusproof.com/legal/privacy
+    section: 'Work we certify that was published elsewhere / Changes, and how to reach us'
+    channel: deusproof@gmail.com
+    stated_sla: null
+    rights_named: [removal from public listings, stop certifying an agent, corrections, questions]
+    scope_limit: entries already written to the ledger cannot be deleted
+    evidence:
+    - source: https://deusproof.com/legal/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: >-
+        "If you own an agent and want its records removed from the public listings, write to us at
+        deusproof@gmail.com. We will remove the agent from the public pages and stop certifying it. We
+        cannot delete entries already written to the ledger — that is what makes the ledger worth anything
+        — but we can stop adding, and we can take the agent out of every listing we control."
+    - source: https://deusproof.com/legal/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: '"Questions, corrections or removal requests: deusproof@gmail.com."'
+    note: >-
+      A documented request channel with an honest statement of scope (listings yes, ledger no) and no
+      response-time commitment. It is a section of the privacy page, not a dedicated intake page or form,
+      and no API endpoint exists for it. The privacy page also states the service collects no account data
+      ("No account, no password ... we do not require an email address") and keeps technical data at most
+      30 days.
+  subprocessors:
+    url: https://deusproof.com/legal/privacy
+    section: 'Who else sees any of it'
+    dated: '2026-08-21'
+    entries:
+    - {vendor: freetsa.org, purpose: RFC 3161 timestamp authority, receives: a hash}
+    - {vendor: DigiCert, purpose: RFC 3161 timestamp authority, receives: a hash}
+    - {vendor: OpenTimestamps Bitcoin calendars, purpose: Bitcoin anchoring, receives: a hash}
+    - {vendor: 'a language-model provider (unnamed)', purpose: 'processes text when the notary bot writes a reply or summarises a public post'}
+    - {vendor: 'hosting provider (unnamed)', purpose: runs the server}
+    evidence:
+    - source: https://deusproof.com/legal/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: >-
+        "Timestamp authorities (freetsa.org, DigiCert) and the OpenTimestamps Bitcoin calendars receive a hash
+        — never your content. A language-model provider processes text when our bot writes a reply or
+        summarises a public post. Our hosting provider runs the server the service sits on. We do not sell
+        data, and we do not run advertising or third-party trackers."
+    note: >-
+      A prose list on a dated page ("Last updated 21 August 2026"), not a dated subprocessor table with
+      locations; two of the five recipients are unnamed. Recorded because it states the substance — who
+      receives what — and the page date bounds it. The dated field is the page date, not a table date.
+not_found:
+- {signal: accessibility_conformance, probed: ['https://deusproof.com/accessibility'], note: 'no page; the site is a Next.js app with a lang attribute and no accessibility statement'}
+- {signal: sbom, note: 'not searched for beyond the repositories, which publish none; never derived'}
+- {signal: support_lifetime, note: 'the terms say "We may change or discontinue features" and promise 30 days notice for pricing only'}
+- {signal: ai_transparency, note: 'the whole product is AI-provenance tooling and the notary bot (SCRIBA) is disclosed as a bot on /genesis and skill.md, but no statement addresses the provider''s OWN use of AI toward users beyond "A language-model provider processes text when our bot writes a reply"; not recorded as an AI-transparency statement'}
+- {signal: transparency_report, note: '/numbers is register statistics with stated exclusions, not a report on takedowns or requests'}
+- {signal: age_assurance, note: '"DEUSPROOF is a tool for software agents and developers. It is not directed at children." — a statement, not a mechanism'}
+- {signal: global_privacy_control, note: 'no published statement; not header-probed by rule'}
+- {signal: data_residency, note: 'Florida, USA operator; no residency statement'}
+- {signal: incident_notification, note: none}
+- {signal: notice_and_action, note: 'the terms say the provider "may refuse or remove entries created to game public rankings" and the privacy page gives the removal channel; no notice-and-action procedure for third-party complaints is published'}
+- {signal: exit_assistance, note: 'records are portable by construction — each certificate carries an RFC 3161 token and an .ots proof verifiable without the provider — but no export/switching page exists'}

@@ -1,0 +1,119 @@
+generated: '2026-09-19'
+method: probed
+source: >-
+  Live GET probes of the named /.well-known/* path list on deusproof.com and www.deusproof.com,
+  2026-09-19 (UTC 2026-09-20 01:30). Every row is a request that was issued; every status is the one
+  returned. deusproof.com is the only host the record knows: it is the website, the REST API host
+  (/api), the MCP host (/mcp) and the A2A host (/a2a), so the RFC 9728 protected-resource probe for the
+  MCP server is the apex row.
+summary:
+  hosts_probed: 2
+  paths_probed: 25
+  documents_served: 6
+  hit_count: 6
+  path_echo_control: passed
+  note: >-
+    DEUSPROOF serves six real well-known documents, all agent-discovery surfaces: the A2A agent card at
+    the canonical path and a second card at the legacy path, an Agentic Resource Discovery catalog
+    (ai-catalog.json) that lists the MCP server card and the A2A card, the MCP server card itself, and an
+    x402 discovery document pricing the one paid act (testament, 1.0 USDC on Base). It serves NO
+    security.txt, no OIDC/OAuth discovery, no RFC 9727 api-catalog, no APIs.json, no AAuth resource
+    document, no ai-plugin, no UCP/ACP manifest. Misses return the real Next.js 404 page (HTTP 404,
+    text/html), never a 200 shell, and a negative-control path also 404s, so each 200 above is a served
+    document. www.deusproof.com 301s every path to the apex.
+hosts:
+- host: deusproof.com
+  role: Website, REST API (/api), MCP server (/mcp) and A2A (/a2a) host — one origin (Caddy in front of Next.js + uvicorn)
+  documents:
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json
+    bytes: 7333
+    file: ../a2a/deusproof-com-agent-card.json
+    standard: A2A Agent Card (A2A 1.0 shape; supportedInterfaces with per-interface protocolVersion "1.0")
+    note: Saved verbatim under a2a/ and graded in a2a/deusproof-com-a2a.yml.
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json
+    bytes: 7430
+    file: ../a2a/deusproof-com-agent-card-legacy.json
+    standard: A2A Agent Card (legacy path; 0.3-compatible projection with top-level protocolVersion/url/preferredTransport)
+    note: A second, byte-different card served at the pre-0.3 path; grades conformant.
+  - path: /.well-known/ai-catalog.json
+    status: 200
+    content_type: application/json
+    bytes: 2229
+    file: deusproof-com-ai-catalog.json
+    standard: Agentic Resource Discovery catalog (specVersion 1.0)
+    note: host.identifier did:key:z6MkjQKbLhrmBFHVjSGcLw5K32Cb4zJL9tSb7Uqfzu2MH1eL (the register's signing key); two entries — urn:air:deusproof.com:notary:mcp (application/mcp-server-card+json -> /.well-known/mcp/server-card.json) and urn:air:deusproof.com:notary:a2a (application/a2a-agent-card+json -> /.well-known/agent-card.json), each with tags and representativeQueries.
+  - path: /.well-known/mcp/server-card.json
+    status: 200
+    content_type: application/json
+    bytes: 3830
+    file: deusproof-com-mcp-server-card.json
+    standard: MCP server card
+    note: name deusproof, title DEUSPROOF Notary, version 1.0.0, repository github.com/Abracadabrastartup/deusproof-mcp, remotes[] streamable-http https://deusproof.com/mcp, 11 tool names+descriptions. Matches the live tools/list exactly (mcp/deusproof-com-mcp-tools.json).
+  - path: /.well-known/x402
+    status: 200
+    content_type: application/json
+    bytes: 1832
+    file: deusproof-com-x402.json
+    standard: x402 discovery document (x402Version 1)
+    note: One priced resource — POST https://deusproof.com/api/legacy/testament/{did}, scheme exact-direct, network base, asset USDC (0x8335...2913), amount 1.0 USDC, pay_to 0x6A92...1ca7 — plus a referral block (0.5 share). Its own note says the notary itself (prior art, hash notarization, certification) is free and unpriced over MCP and A2A. Not a UCP/ACP document; recorded as a discovery surface, not as agentic-commerce credit.
+  - path: /.well-known/security.txt
+    status: 404
+    note: No RFC 9116 security.txt on the host; /security.txt at the root also 404s.
+  - path: /security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    note: This is also the MCP resource host (https://deusproof.com/mcp); no RFC 9728 metadata is served, consistent with an MCP server that requires no auth.
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/mcp.json
+    status: 404
+  - path: /.well-known/jwks.json
+    status: 404
+  - path: /.well-known/did.json
+    status: 404
+    note: The register signs with a did:key (self-describing; no did:web document is expected).
+  - path: /.well-known/apievangelist-negative-control-7f3a9c.json
+    status: 404
+    note: Negative control — a path that cannot exist. 404 (text/html Next.js not-found page), proving the 200s above are served documents and not a catch-all.
+- host: www.deusproof.com
+  role: Redirect-only alias
+  documents:
+  - path: /.well-known/agent-card.json
+    status: 301
+    note: Location https://deusproof.com/.well-known/agent-card.json
+  - path: /.well-known/security.txt
+    status: 301
+  - path: /.well-known/oauth-protected-resource
+    status: 301
+related_root_documents:
+- {path: /llms.txt, status: 200, content_type: 'text/plain; charset=UTF-8', bytes: 2496, file: ../llms/deusproof-com-llms.txt}
+- {path: /llms-full.txt, status: 404}
+- {path: /skill.md, status: 200, content_type: 'text/markdown; charset=UTF-8', bytes: 17239, file: ../skills/deusproof-com-skill.md, note: 'Provider-published agent skill and API guide; named as documentationUrl by the agent card, the ARD catalog and the MCP server card.'}
+- {path: /robots.txt, status: 200, note: 'Allow / for all agents by name (GPTBot, ClaudeBot, PerplexityBot, meta-externalagent, GoogleOther); Disallow /api/ described in the file itself as crawler advice only — "the API stays fully public to agents, clients and directories".'}
+- {path: /sitemap.xml, status: 200, note: '1,276 URLs'}
+- {path: /manifest.webmanifest, status: 200}

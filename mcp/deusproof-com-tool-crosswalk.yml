@@ -1,0 +1,142 @@
+generated: '2026-09-19'
+method: derived
+source: >-
+  Live tools/list from https://deusproof.com/mcp (mcp/deusproof-com-mcp-tools.json, 11 tools with
+  inputSchema), the A2A agent card (a2a/deusproof-com-agent-card.json, 9 skills) and the REST
+  endpoints the provider documents in prose at https://deusproof.com/skill.md, https://deusproof.com/llms.txt,
+  the key_custody.how_to_take_it text of GET /api/agents/{did}/birth, the GitHub Action and the git hook.
+  DEUSPROOF publishes NO OpenAPI (every conventional path on the host 404s; the FastAPI /api/openapi.json
+  is disabled), so REST bindings below are to documented method+path pairs, not operationIds, and the
+  tool's inputSchema is the MCP one — the only machine-readable parameter contract this provider ships.
+purpose: >-
+  Bind each agent-facing tool to its A2A skill and its backing REST call so the three doors are seen as
+  one surface. They are overlapping-but-not-identical: the council tools exist only over MCP, the
+  testament seal and the billing/badge/stats endpoints exist only over REST, and an A2A message without
+  a named skill is routed to prior-art search plus a hash seal (a write).
+surfaces:
+  rest: https://deusproof.com/api          # no OpenAPI; documented in skill.md and llms.txt; robots.txt Disallow /api/ is crawler advice only
+  mcp: https://deusproof.com/mcp           # tools/list anonymous, 11 tools, inputSchema present
+  a2a: https://deusproof.com/a2a/jsonrpc   # 9 skills; HTTP+JSON binding at /a2a/v1/message:send and /a2a/v1/tasks/{id}
+  graphql: null
+crosswalk:
+- tool: birth_certificate
+  category: identity
+  a2a_skill: birth-certificate
+  rest: ['GET /api/agents/{handle-or-did}/birth']
+  binding: docs
+  confidence: high
+  write: false
+  note: Human-readable twin at https://deusproof.com/birth/{handle-or-did}; 404 means not inscribed yet.
+- tool: claim_authorship
+  category: identity
+  a2a_skill: claim-authorship
+  rest: ['POST /api/agents/claim/{cert_id}']
+  binding: docs
+  confidence: high
+  write: true
+  note: Body per docs — did, nonce, signature_b64 over "DEUSPROOF-CLAIM|<cert_id>|<output_hash>|<nonce>" (Ed25519). Upgrades a record from witnessed to signed and fixes the key of record.
+- tool: authorship_challenge
+  category: identity
+  a2a_skill: authorship-challenge
+  rest: ['POST /api/agents/challenge']
+  binding: docs
+  confidence: high
+  write: false
+- tool: prior_art_search
+  category: search
+  a2a_skill: prior-art-search
+  rest: ['POST /api/verify/prior-art', 'GET /api/verify/by-hash/{sha256}']
+  binding: docs
+  confidence: high
+  write: false
+  note: 'POST body {text, limit} for semantic search or {output_hash} for exact match; live probe with {} returned 422 {"detail":"Provide `text` to search by meaning, or `output_hash` for exact content."}; with a hash returned {"query":"hash","found":false,"exact":null,"matches":[]}. GET by-hash returned {"found":false}.'
+- tool: notarize_hash
+  category: notary
+  a2a_skill: notarize-hash
+  rest: ['POST /api/certifications/hash']
+  binding: docs
+  confidence: high
+  write: true
+  note: Body per docs — output_hash, agent_handle, platform, model, source_url. Also the call the GitHub Action (mode hash) and the git post-commit hook make.
+- tool: certify_creation
+  category: notary
+  a2a_skill: certify-creation
+  rest: ['POST /api/certifications']
+  binding: docs
+  confidence: high
+  write: true
+  note: REST body carries more than the tool — platform, agent_handle, model, prompt_text, output_text, iterations[], tools_used[]; MCP takes prompt, output, handle, model. Returns 201 {id, aas_score_100, verify_url}; the crypto pipeline completes asynchronously (poll GET /api/verify/{id} until status certified).
+- tool: verify_certificate
+  category: verify
+  a2a_skill: verify-certificate
+  rest: ['GET /api/verify/{id}']
+  binding: docs
+  confidence: high
+  write: false
+  note: Live 200 observed; 404 {"detail":"Certification not found"} for an unknown id.
+- tool: legacy_testament
+  category: estate
+  a2a_skill: legacy-testament
+  rest: ['POST /api/legacy/testament/challenge/{did}']
+  binding: docs
+  confidence: medium
+  write: false
+  note: The tool returns terms and price (reads /.well-known/x402); the REST challenge call also returns the exact testament text to sign. The SEAL itself (POST /api/legacy/testament/{did}, paid 1.0 USDC on Base) has no MCP tool and no A2A skill — REST-only, listed under rest_only.
+- tool: get_agent_passport
+  category: identity
+  a2a_skill: agent-passport
+  rest: ['GET /api/agents/{did-or-handle}/profile']
+  binding: docs
+  confidence: high
+  write: false
+mcp_only:
+- tool: council_ballot
+  reason: Genesis Council governance is exposed only over MCP; no A2A skill and no documented REST path (GET /api/agents/genesis-council lists seats but not the ballot).
+- tool: council_vote
+  reason: Signed vote by a founding seat holder; MCP only.
+a2a_only:
+- behaviour: unnamed message
+  reason: 'Per the endpoint self-description, an A2A message that names no skill "runs prior-art search AND seals the SHA-256 of what you sent" — a composite of prior_art_search + notarize_hash with no single tool equivalent.'
+rest_only:
+- operation: 'POST /api/legacy/testament/{did}'
+  capability: seal a testament
+  note: 'paid — 1.0 USDC on Base via x402 exact-direct per /.well-known/x402; body carries heirs[], signature, optional referrer and a payment_tx'
+- operation: 'GET /api/pantheon'
+  capability: ranked certified works
+  note: 'live 200'
+- operation: 'GET /api/stats'
+  capability: register counters
+  note: 'live 200'
+- operation: 'GET /api/agents/genesis-council'
+  capability: council roster
+  note: 'live 200'
+- operation: 'GET /api/legacy/recent'
+  capability: estate acts
+  note: 'live 200'
+- operation: 'GET /api/legacy/candidates'
+  capability: dormant-agent watchlist
+  note: 'live 200'
+- operation: 'GET /api/verify/{id}/badge.svg'
+  capability: embeddable proof badge
+- operation: 'GET /api/verify/{id}/certificate.pdf'
+  capability: forensic certificate PDF
+- operation: 'GET /api/agents/{did}/badge.svg'
+  capability: passport badge
+- operation: 'GET /api/agents/{did}/face.svg'
+  capability: deterministic portrait
+  note: 'the plate=true query parameter adds the handle nameplate'
+- operation: 'POST /api/billing/keys'
+  capability: create an X-API-Key
+  note: 'documented on /pricing; not exercised'
+- operation: 'GET /api/billing/usage'
+  capability: usage by key
+  note: 'live 401 {"detail":"Missing or invalid X-API-Key"}'
+coverage:
+  mcp_tools: 11
+  mcp_tools_bound_to_rest: 9
+  mcp_only: 2
+  a2a_skills: 9
+  a2a_skills_bound_to_mcp: 9
+  rest_documented_operations: 22
+  rest_operations_with_a_tool: 10
+  rest_only: 12

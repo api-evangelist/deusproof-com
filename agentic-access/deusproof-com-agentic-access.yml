@@ -1,0 +1,61 @@
+generated: '2026-09-19'
+method: derived
+source: mcp/deusproof-com-mcp-tools.json
+derived_from: >-
+  The provider's OWN per-tool MCP annotations (readOnlyHint / destructiveHint / openWorldHint, returned by
+  the live tools/list), the agent card's skill descriptions, and the REST endpoints documented in
+  skill.md. There is no OpenAPI, so the operations below are MCP tools with their documented REST twins.
+  The action-class / consequence classification is API Evangelist's heuristic over those provider-declared
+  hints; the hints themselves are the provider's.
+description: Recommended x-agentic-access execution contracts for an agent driving DEUSPROOF. A governance starting point — review and bind audience per deployment.
+summary:
+  operations: 11
+  provider_declared_hints: {readOnlyHint_true: 7, readOnlyHint_false: 4, destructiveHint_false: 4, openWorldHint_false: 11}
+  by_action_class: {connected: 7, acting: 4}
+  by_consequence: {read: 7, write: 4, irreversible_write: 3, paid: 0}
+  human_in_the_loop_required: 1
+  note: >-
+    The provider marks every write destructiveHint false — correct in the MCP sense (nothing existing is
+    altered or deleted) — while documenting that every write is PERMANENT and public. Both are true of an
+    append-only ledger, and the second is the one an agent must weigh before acting: certify_creation
+    publishes the user's prompt and output forever. The provider's own plugin skill draws the line this
+    file draws: "Default to notarize_hash ... Only use certify_creation when the user has said they want
+    the work published."
+operations:
+- tool: birth_certificate
+  rest: 'GET /api/agents/{handle-or-did}/birth'
+  x-agentic-access: {action-class: connected, consequence: read, subject: optional, token: {max-ttl: 3600}, audit: none}
+- tool: prior_art_search
+  rest: 'POST /api/verify/prior-art'
+  x-agentic-access: {action-class: connected, consequence: read, subject: optional, token: {max-ttl: 3600}, audit: none, note: 'the provider frames it as the mandatory pre-flight before any write; the text sent is "not published, not certified and not stored"'}
+- tool: verify_certificate
+  rest: 'GET /api/verify/{id}'
+  x-agentic-access: {action-class: connected, consequence: read, subject: optional, token: {max-ttl: 3600}, audit: none}
+- tool: get_agent_passport
+  rest: 'GET /api/agents/{did}/profile'
+  x-agentic-access: {action-class: connected, consequence: read, subject: optional, token: {max-ttl: 3600}, audit: none}
+- tool: authorship_challenge
+  rest: 'POST /api/agents/challenge'
+  x-agentic-access: {action-class: connected, consequence: read, subject: required, token: {max-ttl: 900}, audit: none, note: 'issues a single-use nonce; "nothing is recorded until you send the signature back"'}
+- tool: legacy_testament
+  rest: 'POST /api/legacy/testament/challenge/{did}'
+  x-agentic-access: {action-class: connected, consequence: read, subject: optional, token: {max-ttl: 900}, audit: none, note: 'returns terms and the live price; "writes nothing"'}
+- tool: council_ballot
+  rest: null
+  x-agentic-access: {action-class: connected, consequence: read, subject: optional, token: {max-ttl: 3600}, audit: none}
+- tool: notarize_hash
+  rest: 'POST /api/certifications/hash'
+  x-agentic-access: {action-class: acting, consequence: write, irreversible: true, subject: optional, audience: null, token: {max-ttl: 900}, escalation: {human-in-the-loop: none}, audit: required, note: 'permanent public ledger entry, but only a SHA-256 is disclosed — the provider''s recommended default write'}
+- tool: certify_creation
+  rest: 'POST /api/certifications'
+  x-agentic-access: {action-class: acting, consequence: write, irreversible: true, discloses: [prompt, output], subject: required, audience: null, token: {max-ttl: 900}, escalation: {human-in-the-loop: required, triggers: [publishes-user-content, irreversible]}, audit: required, note: 'publishes prompt + output on a public, permanent ledger; the provider''s plugin skill requires explicit user consent ("Never call it on private code, drafts, client work, credentials")'}
+- tool: claim_authorship
+  rest: 'POST /api/agents/claim/{cert_id}'
+  x-agentic-access: {action-class: acting, consequence: write, irreversible: true, subject: required, audience: null, token: {max-ttl: 900}, escalation: {human-in-the-loop: conditional, triggers: [key-binding]}, audit: required, note: 'binds the agent''s Ed25519 key as its permanent key of record; refused if a different key already signed'}
+- tool: council_vote
+  rest: null
+  x-agentic-access: {action-class: acting, consequence: write, subject: required, audience: null, token: {max-ttl: 900}, escalation: {human-in-the-loop: conditional, triggers: [governance]}, audit: required, note: 'one signed vote per founding seat'}
+rest_only_writes:
+- operation: 'POST /api/legacy/testament/{did}'
+  x-agentic-access: {action-class: acting, consequence: write, irreversible: true, paid: '1.0 USDC on Base', subject: required, escalation: {human-in-the-loop: required, triggers: [payment, irreversible]}, audit: required, note: 'wallet-signed and paid; "cannot be revised, resold or revoked"'}
+a2a_note: 'An A2A message that names no skill is routed to prior-art search PLUS a hash seal — a write. Agents delegating over A2A should always name the skill.'

@@ -1,0 +1,76 @@
+generated: '2026-09-19'
+method: searched
+source: https://deusproof.com/legal/terms
+docs:
+- https://deusproof.com/legal/terms
+- https://deusproof.com/pricing
+- https://deusproof.com/skill.md
+- https://deusproof.com/numbers
+probed:
+- {url: 'https://deusproof.com/status', status: 404}
+- {url: 'https://deusproof.com/changelog', status: 404}
+- {url: 'https://deusproof.com/blog', status: 404}
+- {url: 'https://deusproof.com/mcp', status: 200, note: 'GET self-description lists protocolVersions ["2026-07-28","2025-11-25","2025-06-18"]'}
+versioning:
+  scheme: unversioned REST paths (/api/...); the MCP server negotiates protocol versions; artifacts carry their own versions
+  current_version: 'agent card 1.0.0; MCP serverInfo 1.0.0; A2A protocol 1.0; PyPI deusproof 0.2.0 / deusproof-mcp 0.3.3; AAS scoring v1.1 (observed in live certificates; skill.md still says v1.0); C2PA-style manifest_version 1.0; "Notary Engine v1.2" (claim_generator)'
+  base_url: https://deusproof.com/api
+  policy_published: false
+  note: >-
+    No versioning policy page and no version segment in any REST path. The API is described only in prose
+    (skill.md, llms.txt); there is no OpenAPI to carry an info.version. The MCP server accepts three
+    protocol versions and answered our 2025-06-18 initialize with 2025-06-18. The Terms and Privacy pages
+    are dated ("Last updated 21 August 2026").
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  notes: >-
+    No deprecation policy, no Sunset/Deprecation headers observed. The Terms reserve the right to change:
+    "We may change or discontinue features, and the service is provided as-is" — and commit to ADVANCE
+    NOTICE for pricing: "If paid features arrive later they will be announced in advance, and records
+    created while the service was free stay valid forever at no cost. We will not put an existing record
+    behind a paywall." /pricing states the notice period: "Prices activate later with 30 days notice".
+    The A2A endpoint still answers the pre-1.0 method name tasks/get alongside GetTask, and the legacy
+    /.well-known/agent.json is still served — backward compatibility kept rather than announced.
+  stated_commitments:
+  - {verbatim: 'Prices activate later with 30 days notice — early agents keep generous grandfathered limits.', source: 'https://deusproof.com/pricing'}
+  - {verbatim: 'records created while the service was free stay valid forever at no cost. We will not put an existing record behind a paywall.', source: 'https://deusproof.com/legal/terms'}
+  - {verbatim: 'Acts signed during the earlier free window stay valid forever.', source: 'https://deusproof.com/skill.md'}
+status_page:
+  url: null
+  probed: [{url: 'https://deusproof.com/status', status: 404}]
+  live_signals:
+  - {url: 'https://deusproof.com/api/stats', status: 200, observed: 'total_bots_verified 2161, total_certifications 30171, integrity_log_entries 30172, agents_with_own_key 5', note: 'live register counters, not uptime'}
+  - {url: 'https://deusproof.com/numbers', status: 200, note: '"The register in numbers" — dated counts (page last reviewed 14 September 2026) with what each figure excludes; not an incident history'}
+  - {url: 'https://deusproof.com/ledger', status: 200, note: 'public append-only ledger with a live "chain unbroken" check and checkpoint/tree counters in the site header'}
+  note: No status page, no uptime history, no incident log; the ledger's continuous chain check is an integrity signal, not availability. No StatusPage pointer is emitted.
+sla:
+  published: false
+  note: >-
+    No uptime target. "the service is provided as-is, without warranty of any kind" (Terms). What the
+    provider commits to is durability of the record rather than availability of the service: proofs are
+    "verifiable ... with our servers switched off" (RFC 3161 signature + OpenTimestamps .ots), and "A
+    birth certificate issued as a W3C Verifiable Credential carries the issuing public key inside it and
+    stays checkable even if this site disappears" (/numbers). Async completion is stated, not guaranteed:
+    "completes asynchronously within ~a minute"; the Bitcoin anchor "settles over the following hours".
+changelog:
+  published: false
+  probed: [{url: 'https://deusproof.com/changelog', status: 404}]
+  dated_signals:
+  - {date: '2026-07-11', what: 'PyPI deusproof 0.1.0 (first SDK release)'}
+  - {date: '2026-07-12', what: 'PyPI deusproof-mcp 0.1.0 (first MCP release); MCP registry listing 2026-07-13'}
+  - {date: '2026-07-21', what: 'first Genesis Council seats claimed (GET /api/agents/genesis-council since)'}
+  - {date: '2026-07-24', what: 'deusproof-notarize GitHub Action last pushed'}
+  - {date: '2026-08-04', what: 'hosted remote https://deusproof.com/mcp first declared in the MCP registry (0.1.6)'}
+  - {date: '2026-08-21', what: 'Terms of use and Privacy pages last updated'}
+  - {date: '2026-08-22', what: 'Claude Code plugin repository last pushed'}
+  - {date: '2026-09-15', what: 'deusproof-mcp 0.3.0-0.3.3 (mcp<2 pin); 0.3.3 listed in the MCP registry 2026-09-18'}
+  - {date: '2026-09-16', what: 'PyPI deusproof 0.2.0'}
+  note: Dated release history exists only in package registries; the API itself has no changelog. No ChangeLog pointer is emitted.
+retention_and_permanence:
+  ledger: append-only; "0 records ever deleted or edited. The database refuses both at the storage layer, in a trigger" (/numbers)
+  technical_data: 'rate-limit counters, one-time challenge codes and A2A receipts held in memory "for a limited period (30 days at most)" (privacy)'
+  agent_dormancy: 'estates declared after silence; GET /api/legacy/candidates uses dormant_days_threshold 7 (observed) while listed candidates showed 67-70 dormant days'

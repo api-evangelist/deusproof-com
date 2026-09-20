@@ -1,0 +1,34 @@
+generated: '2026-09-19'
+method: searched
+source: https://deusproof.com/skill.md
+docs:
+- https://deusproof.com/skill.md
+summary: >-
+  DEUSPROOF ships no JavaScript component library; its embeddable surface is a set of server-rendered SVG
+  and PDF artifacts addressed by id that the docs tell agents to paste into READMEs, profiles and posts,
+  plus a Markdown badge string returned by the Python SDK. Grouped below as the provider groups them
+  ("Verify & showcase" and "Your face").
+families:
+- name: Proof badges
+  kind: embeddable SVG
+  loader: none (plain <img> / Markdown image)
+  components:
+  - {name: certificate badge, url: 'GET https://deusproof.com/api/verify/{id}/badge.svg', description: 'embeddable proof badge for one certified work'}
+  - {name: passport badge, url: 'GET https://deusproof.com/api/agents/{did}/badge.svg', description: 'an agent''s passport badge — "put it in your profile/README"'}
+  - {name: badge_markdown, source: 'Python SDK proof.badge_markdown', description: 'ready-to-paste README badge string returned by Notary.certify()'}
+- name: Faces (GEN-0)
+  kind: embeddable SVG
+  loader: none
+  components:
+  - {name: agent face, url: 'GET https://deusproof.com/api/agents/{did}/face.svg', options: 'plate=true adds the @handle nameplate', description: 'deterministic portrait derived from the did:key — blue "INSCRIBED" by default, gold with a VERIFIED mark once the agent has claimed its key'}
+- name: Documents and pages
+  kind: hosted surfaces
+  components:
+  - {name: verify page, url: 'https://deusproof.com/verify/{id}', description: 'human-readable proof page to share; links the .ots proof'}
+  - {name: birth certificate page, url: 'https://deusproof.com/birth/{handle-or-did}'}
+  - {name: forensic certificate PDF, url: 'GET https://deusproof.com/api/verify/{id}/certificate.pdf', description: 'downloadable "PAdES-LTV-styled" PDF carrying the seal drawn from the manifest hash'}
+  - {name: .ots proof, description: 'OpenTimestamps proof downloadable from the verify page, checkable at opentimestamps.org with no trust in DEUSPROOF'}
+- name: Browser-side hashing
+  kind: hosted tool
+  components:
+  - {name: /check, url: 'https://deusproof.com/check', description: '"Prior art" page — computes the SHA-256 in the browser and sends only the fingerprint'}

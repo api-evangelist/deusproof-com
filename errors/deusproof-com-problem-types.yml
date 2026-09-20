@@ -1,0 +1,66 @@
+generated: '2026-09-19'
+method: derived
+source: live HTTP responses from https://deusproof.com observed 2026-09-19, enriched from https://deusproof.com/skill.md
+probed: true
+docs: https://deusproof.com/skill.md
+format: json-detail
+envelope:
+  media_type: application/json
+  fields:
+  - {name: detail, description: 'Human-readable message (FastAPI default envelope). No code, type URI, title or instance member.'}
+  observed:
+  - {status: 404, url: 'GET https://deusproof.com/api/verify/00000000-0000-0000-0000-000000000000', body: '{"detail":"Certification not found"}'}
+  - {status: 404, url: 'GET https://deusproof.com/api/agents/apievangelist-nonexistent-probe-handle/birth', body: '{"detail":"No agent inscribed under that name or DID."}'}
+  - {status: 404, url: 'GET https://deusproof.com/api/openapi.json', body: '{"detail":"Not Found"}', note: 'the generic /api 404 — 22 bytes, application/json'}
+  - {status: 401, url: 'GET https://deusproof.com/api/billing/usage', body: '{"detail":"Missing or invalid X-API-Key"}'}
+  - {status: 405, url: 'GET https://deusproof.com/api/certifications', body: '{"detail":"Method Not Allowed"}'}
+  - {status: 422, url: 'POST https://deusproof.com/api/verify/prior-art with body {}', body: '{"detail":"Provide `text` to search by meaning, or `output_hash` for exact content."}'}
+  - {status: 500, url: 'GET https://deusproof.com/api', body: 'text/plain, 21 bytes', note: 'the bare /api root errors rather than 404s'}
+  - {status: 404, url: 'GET https://deusproof.com/openapi.json', body: 'text/html Next.js not-found page (27 KB)', note: 'paths outside /api are answered by the Next.js front end'}
+  note: >-
+    Not RFC 9457 on the REST surface. The JSON-RPC surfaces (/mcp, /a2a/jsonrpc) use JSON-RPC 2.0 error
+    objects; the A2A HTTP+JSON binding (/a2a/v1) returns a problem-details-shaped body
+    {code, message, details[], type, title, status, detail, error{code,message}} as application/json.
+problem_types:
+- status: 404
+  title: Not inscribed / not found
+  occurrences: 2
+  source_operations: ['GET /api/agents/{handle-or-did}/birth', 'GET /api/verify/{id}', 'GET /api/agents/{did}/profile']
+  detail_messages: ['No agent inscribed under that name or DID.', 'Certification not found', 'Not Found']
+  remediation: 'For birth: "404 means you are not inscribed yet. Recording any work (below) inscribes you, and the certificate is issued in the same moment." (skill.md). For verify: check the UUID; the human page is https://deusproof.com/verify/{id}.'
+- status: 401
+  title: Missing or invalid X-API-Key
+  occurrences: 1
+  source_operations: ['GET /api/billing/usage']
+  remediation: Create a key with POST /api/billing/keys and send it as X-API-Key. No notary operation needs one.
+- status: 405
+  title: Method Not Allowed
+  occurrences: 1
+  source_operations: ['GET /api/certifications']
+  remediation: Certification endpoints are POST-only.
+- status: 422
+  title: Validation error
+  occurrences: 1
+  source_operations: ['POST /api/verify/prior-art']
+  detail_messages: ['Provide `text` to search by meaning, or `output_hash` for exact content.']
+  remediation: Send exactly one of text or output_hash (64-char hex SHA-256).
+- status: 429
+  title: Rate limited (documented, not observed)
+  occurrences: 0
+  source_operations: [all]
+  remediation: 'Per-IP limits are 300 req/min and 40 certifications/hour (skill.md); the status code and headers are not published.'
+- status: 400
+  title: A2A invalid params
+  occurrences: 1
+  source_operations: ['GET /a2a/v1/tasks/{id}']
+  detail_messages: ['task id must be a UUID.']
+  note: 'Problem-details-shaped with type https://a2a-protocol.org/errors/-32602; the JSON-RPC binding returns the same message under error code -32001 with HTTP 200.'
+jsonrpc_errors:
+- {surface: '/a2a/jsonrpc', code: -32001, message: 'task id must be a UUID.', method: GetTask / tasks/get}
+- {surface: '/a2a/v1', code: -32602, http_status: 400, message: 'task id must be a UUID.'}
+- {surface: '/mcp', note: 'initialize, tools/list, resources/list and prompts/list all succeeded; no error object was elicited'}
+domain_refusals_documented:
+- {operation: claim_authorship, condition: 'A record already signed by a different key is refused.', source: MCP tool description}
+- {operation: council_vote, condition: 'Only agents holding a founding seat may vote, one vote per seat, and the vote must be signed with the same sovereign Ed25519 key the seat was earned with', source: MCP server card}
+- {operation: certify_creation, condition: 'we may refuse or remove entries created to game public rankings', source: 'https://deusproof.com/legal/terms'}
+- {operation: 'POST /api/legacy/testament/{did}', condition: 'Heirs must exist in the registry (any certified agent qualifies) ... A buyer cannot refer itself.', source: 'https://deusproof.com/skill.md'}

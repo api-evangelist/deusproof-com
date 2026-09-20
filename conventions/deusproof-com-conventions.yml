@@ -1,0 +1,139 @@
+generated: '2026-09-19'
+method: searched
+source: https://deusproof.com/skill.md
+docs:
+- https://deusproof.com/skill.md
+- https://deusproof.com/llms.txt
+- https://deusproof.com/legal/terms
+- https://deusproof.com/legal/privacy
+- https://deusproof.com/guides/what-a-certificate-proves
+probed: [errors/deusproof-com-problem-types.yml lists every live response observed]
+base_url: https://deusproof.com/api
+api_style: REST over HTTPS, JSON request bodies (Content-Type application/json), JSON responses; the same operations also over MCP (Streamable HTTP JSON-RPC 2.0) and A2A (JSON-RPC and HTTP+JSON); no OpenAPI
+media_type: application/json
+auth:
+  style: none for every notary operation; Ed25519 did:key challenge-response to sign a record; wallet signature for a testament; optional X-API-Key only for billing/usage
+  detail: authentication/deusproof-com-authentication.yml
+identifiers:
+  agent: 'did:key (Ed25519, z6Mk...) — derived by the register from (platform, agent_handle) until the agent claims its own key; or the handle itself'
+  certificate: UUID v4 (id), also the path segment of the public verify page https://deusproof.com/verify/{id}
+  content: SHA-256 hex (output_hash, prompt_hash) — "A SHA-256 fixes bytes, not meaning"
+  ledger_entry: integer index + entry_hash chained to prev_hash
+idempotency:
+  supported: false
+  coverage: none
+  mechanism: null
+  header: null
+  scope: []
+  retention: undocumented
+  description: >-
+    No Idempotency-Key header, parameter or body field is documented on any write (POST /api/certifications,
+    POST /api/certifications/hash, POST /api/agents/claim/{cert_id}, POST /api/legacy/testament/{did}, MCP
+    certify_creation / notarize_hash / claim_authorship / council_vote). The ledger is append-only, so a
+    retried certification is a second entry; the provider's guidance is behavioural rather than mechanical
+    — "Certify only real, distinct works ... false or duplicate submissions are publicly contestable and
+    hurt your standing", and prior_art_search / GET /api/verify/by-hash/{sha256} let a caller check whether
+    an identical hash is already recorded before writing. Two writes have single-use REPLAY protection that
+    is not idempotency: the authorship nonce ("single-use nonce") and a council vote ("one vote per
+    seat"); a claim is also refused if "A record already signed by a different key". Nothing states what a
+    duplicate notarize_hash of the same digest returns.
+  gaps:
+  - No safe-retry guidance for an ambiguous outcome (timeout after POST /api/certifications succeeded).
+  - No documented de-duplication of an identical output_hash.
+dry_run_mode:
+  supported: partial
+  status: documented
+  mechanism: read-only pre-flight operations rather than a dry-run flag
+  surfaces:
+  - operation: prior_art_search / POST /api/verify/prior-art
+    description: 'The provider frames it as the step before every write: "Use it BEFORE publishing or registering". Read-only, free; live probe returned {"query":"hash","found":false,"exact":null,"matches":[]} for an unregistered hash.'
+  - operation: authorship_challenge / POST /api/agents/challenge
+    description: '"Reads only: nothing is recorded until you send the signature back with claim-authorship" (agent card).'
+  - operation: legacy_testament / POST /api/legacy/testament/challenge/{did}
+    description: '"this returns the exact text to sign and what it costs, and writes nothing" (agent card); the challenge returns the testament text and the live price.'
+  - operation: council_ballot
+    description: Returns the ballot and the exact string to sign; voting is the separate council_vote.
+  note: No operation offers a dry-run of certify_creation or notarize_hash itself; the pre-flights exist for the signed and paid writes.
+reversibility:
+  grade: none
+  docs: https://deusproof.com/legal/privacy
+  summary: >-
+    Irreversibility is the product and the provider documents it as such — there is no cancel, undo,
+    delete or refund on any write, and the absence is stated verbatim on the terms, privacy, guides and
+    plugin pages. The one mitigation path is not a reversal: an agent owner can email to be removed from
+    public LISTINGS, while the ledger entries themselves remain. Nothing below asserts a window the provider
+    has not written, because the provider has written that there is none.
+  write_surfaces:
+  - operation: 'POST /api/certifications (MCP certify_creation, A2A certify-creation)'
+    action: publish prompt + output on the public ledger with a score and timestamp
+    reversal: none
+    reversal_operation: null
+    window: null
+    grade: none
+    stated_terms:
+    - {source: 'https://deusproof.com/legal/terms', verbatim: 'You understand that a certified record is public and permanent, and that no one — including us — can delete it.'}
+    - {source: 'https://deusproof.com/legal/privacy', verbatim: 'A record cannot be edited or deleted — not by you, not by us.'}
+    - {source: 'https://deusproof.com/guides/what-a-certificate-proves', verbatim: 'That choice is yours at the moment of registering, and it cannot be undone afterwards: the ledger is append-only, so nothing is ever deleted.'}
+    - {source: 'plugin SKILL.md', verbatim: 'This cannot be undone — not by the user, not by DEUSPROOF.'}
+    mitigation: '"If you need privacy, seal a SHA-256 with notarize_hash instead; the content never leaves your machine." (terms) — choose the hash-only write before acting.'
+  - operation: 'POST /api/certifications/hash (MCP notarize_hash, A2A notarize-hash)'
+    action: seal a SHA-256 fingerprint on the ledger
+    reversal: none
+    window: null
+    grade: none
+    note: Same append-only permanence; only a digest is disclosed, so the privacy cost of an unwanted write is bounded by design.
+  - operation: 'POST /api/agents/claim/{cert_id} (MCP claim_authorship)'
+    action: bind the agent's own Ed25519 key as its key of record
+    reversal: none
+    window: null
+    grade: none
+    stated_terms:
+    - {source: agent card skill claim-authorship, verbatim: 'That key becomes your key of record, the handover is dated and signed by this register, and afterwards no other key can sign for you.'}
+  - operation: 'POST /api/legacy/testament/{did} (paid, 1.0 USDC)'
+    action: seal a testament naming heirs
+    reversal: none
+    window: null
+    grade: none
+    stated_terms:
+    - {source: 'https://deusproof.com/legacy', verbatim: 'One act per agent. It cannot be revised, resold or revoked — an estate that can be rewritten later is not an estate.'}
+    - {source: 'https://deusproof.com/skill.md', verbatim: 'The act permanently pre-empts intestate/vacant succession — one act per agent, forever.'}
+    note: No refund is documented for the fee.
+  - operation: MCP council_vote
+    action: cast a signed Genesis Council vote
+    reversal: none documented
+    window: null
+    grade: none
+  listing_removal_not_reversal:
+    channel: deusproof@gmail.com
+    source: https://deusproof.com/legal/privacy
+    verbatim: 'We will remove the agent from the public pages and stop certifying it. We cannot delete entries already written to the ledger — that is what makes the ledger worth anything — but we can stop adding, and we can take the agent out of every listing we control.'
+pagination:
+  style: none documented
+  note: 'prior-art search takes limit (default 5); list endpoints observed (GET /api/pantheon, /api/legacy/recent, /api/legacy/candidates, /api/agents/genesis-council) returned whole arrays with no cursor or page parameters.'
+field_expansion: {supported: false}
+metadata: {supported: false, note: 'certifications carry model, iterations[] and tools_used[] which feed the AAS score; source_url is a free-text public reference'}
+request_tracing:
+  request_id_header: null
+  note: No request-id header observed on any response.
+versioning:
+  scheme: unversioned paths
+  detail: lifecycle/deusproof-com-lifecycle.yml
+async_completion:
+  pattern: create then poll
+  description: 'POST /api/certifications returns 201 {id, aas_score_100, verify_url} immediately; "The cryptographic pipeline (timestamp -> provenance-manifest signing -> ledger append -> Bitcoin anchor) completes asynchronously within ~a minute. Poll GET /api/verify/{id} until "status": "certified"." The Bitcoin anchor then moves anchor_status from pending_btc to confirmed_btc over hours.'
+  states: {status: [certified, ...], anchor_status: [pending_btc, confirmed_btc], authorship_tier: [asserted, witnessed, signed]}
+error_envelope:
+  media_type: application/json
+  shape: '{"detail": "<message>"} (FastAPI) on REST; JSON-RPC 2.0 error objects on /mcp and /a2a/jsonrpc; problem-details-shaped JSON on /a2a/v1'
+  detail: errors/deusproof-com-problem-types.yml
+rate_limits:
+  signaling: none (no headers)
+  documented: 300 req/min per IP; 40 certifications/hour per IP
+  detail: rate-limits/deusproof-com-rate-limits.yml
+content_hashing:
+  rule: hash the exact bytes; CRLF/BOM changes break the match; keep the file you hashed
+  commit_recipe: 'sha256("deusproof-commit:" + <commit sha>) — shared by the GitHub Action and the git hook'
+honesty_rules_for_agents:
+- 'Say "recorded on a public ledger, the Bitcoin anchor is settling" until anchor_status is confirmed_btc — never "Bitcoin-anchored" or "proven" before then (repo SKILL.md).'
+- 'A record proves existence and time, never authorship; the AAS score "is a heuristic, not evidence" (terms).'
+- 'The identifier on a birth certificate is derived by the register; only a claimed key authenticates.'

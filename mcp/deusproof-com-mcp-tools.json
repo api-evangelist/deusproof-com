@@ -1,0 +1,516 @@
+[
+  {
+    "name": "generate_website",
+    "description": "Generate a new website from a text prompt using ChilledSites AI. Supports different types: website (default), landing page, PWA, React app, dashboard, or portfolio. Returns website ID and preview details.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Detailed description of the website to generate. Include purpose, target audience, key features, style preferences, and any specific requirements."
+        },
+        "agentType": {
+          "type": "string",
+          "enum": [
+            "website",
+            "landing",
+            "pwa",
+            "react",
+            "dashboard",
+            "portfolio"
+          ],
+          "description": "Type of website to generate. Default: website",
+          "default": "website"
+        },
+        "creativeBrief": {
+          "type": "string",
+          "description": "Optional creative brief with brand guidelines, tone, messaging strategy, etc."
+        },
+        "designSelections": {
+          "type": "object",
+          "description": "Optional design preferences (colors, fonts, layout style)"
+        }
+      },
+      "required": [
+        "prompt"
+      ]
+    }
+  },
+  {
+    "name": "create_website_from_code",
+    "description": "Upload custom HTML/CSS/JS code to ChilledSites. Use this when you've built a website locally (with or without AI assistance) and want to save it to your ChilledSites account for hosting and deployment. Perfect for local-first development workflows.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title for the website (e.g., 'My Portfolio', 'Landing Page')"
+        },
+        "html_code": {
+          "type": "string",
+          "description": "Complete HTML code for the website. Should include <!DOCTYPE html>, <html>, <head>, and <body> tags."
+        },
+        "css_code": {
+          "type": "string",
+          "description": "CSS styles (optional). Will be automatically embedded in the HTML."
+        },
+        "js_code": {
+          "type": "string",
+          "description": "JavaScript code (optional). Will be automatically embedded in the HTML."
+        },
+        "meta_description": {
+          "type": "string",
+          "description": "SEO meta description (optional)"
+        },
+        "agentType": {
+          "type": "string",
+          "enum": [
+            "website",
+            "landing",
+            "pwa",
+            "react",
+            "dashboard",
+            "portfolio"
+          ],
+          "description": "Type of website. Default: website",
+          "default": "website"
+        }
+      },
+      "required": [
+        "title",
+        "html_code"
+      ]
+    }
+  },
+  {
+    "name": "list_websites",
+    "description": "List all websites for the authenticated user. Returns an array of websites with basic information (id, title, description, deployed URL, timestamps).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "get_website",
+    "description": "Get complete details of a specific website including HTML, CSS, and JavaScript code. Use this to view or analyze a website before editing.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "website_id": {
+          "type": "string",
+          "description": "The UUID of the website to retrieve"
+        }
+      },
+      "required": [
+        "website_id"
+      ]
+    }
+  },
+  {
+    "name": "update_website",
+    "description": "Update a website's code (HTML, CSS, JS) or metadata. Provide only the fields you want to update. Perfect for making edits after generation or applying user-requested changes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "website_id": {
+          "type": "string",
+          "description": "The UUID of the website to update"
+        },
+        "title": {
+          "type": "string",
+          "description": "New title for the website"
+        },
+        "meta_description": {
+          "type": "string",
+          "description": "New meta description"
+        },
+        "html_code": {
+          "type": "string",
+          "description": "Updated HTML code"
+        },
+        "css_code": {
+          "type": "string",
+          "description": "Updated CSS code"
+        },
+        "js_code": {
+          "type": "string",
+          "description": "Updated JavaScript code"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Updated metadata (SEO, tags, etc.)"
+        }
+      },
+      "required": [
+        "website_id"
+      ]
+    }
+  },
+  {
+    "name": "delete_website",
+    "description": "Permanently delete a website. This action cannot be undone. Use with caution.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "website_id": {
+          "type": "string",
+          "description": "The UUID of the website to delete"
+        }
+      },
+      "required": [
+        "website_id"
+      ]
+    }
+  },
+  {
+    "name": "deploy_website",
+    "description": "Deploy a website to ChilledSites hosting. Makes the website publicly accessible at a .chilledsites.com subdomain. Returns the live URL.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "website_id": {
+          "type": "string",
+          "description": "The UUID of the website to deploy"
+        },
+        "subdomain": {
+          "type": "string",
+          "description": "Optional custom subdomain (e.g., 'mysite' for mysite.chilledsites.com). If not provided, uses website name."
+        }
+      },
+      "required": [
+        "website_id"
+      ]
+    }
+  },
+  {
+    "name": "get_token_balance",
+    "description": "Check the current token balance for the authenticated user. Returns available tokens, total purchased, and total used. Useful before generating websites which consume tokens.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "generate_image",
+    "description": "Generate an AI-powered image from a text prompt. Supports multiple models: Gemini 2.5 Flash (1500 tokens), Gemini 2.5 Pro (2500 tokens), Imagen 3 (3500 tokens), and DALL-E 3 (3000 tokens). Returns the generated image URL and base64 data. Perfect for creating custom graphics, illustrations, product mockups, and visual content.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Detailed description of the image to generate. Be specific about subject, composition, lighting, colors, mood, and style."
+        },
+        "model": {
+          "type": "string",
+          "enum": [
+            "gemini-2.5-flash-image-preview",
+            "gemini-2.5-pro-image-preview",
+            "imagen-3",
+            "dall-e-3"
+          ],
+          "description": "AI model to use for generation. Default: gemini-2.5-flash-image-preview (fastest, 1500 tokens)",
+          "default": "gemini-2.5-flash-image-preview"
+        },
+        "style": {
+          "type": "string",
+          "description": "Optional style modifier (e.g., 'photographic', 'illustration', 'watercolor', 'digital art', '3d render')"
+        },
+        "aspectRatio": {
+          "type": "string",
+          "enum": [
+            "1:1",
+            "16:9",
+            "9:16",
+            "4:3",
+            "3:4"
+          ],
+          "description": "Aspect ratio for the image. Default: 1:1 (square)",
+          "default": "1:1"
+        },
+        "negativePrompt": {
+          "type": "string",
+          "description": "Optional: describe what to avoid in the image (e.g., 'blurry, low quality, text')"
+        }
+      },
+      "required": [
+        "prompt"
+      ]
+    }
+  },
+  {
+    "name": "generate_video",
+    "description": "Generate an AI-powered video from a text prompt using Veo 3.1. Creates 6-10 second videos in various aspect ratios. Costs 8000 tokens. Videos take 2-5 minutes to generate. Supports text-to-video and optional reference images for character consistency.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Detailed description of the video to generate. Include action, setting, mood, camera movement, and key visual elements."
+        },
+        "aspectRatio": {
+          "type": "string",
+          "enum": [
+            "9:16",
+            "16:9",
+            "1:1"
+          ],
+          "description": "Video aspect ratio. 9:16 for vertical (stories/reels), 16:9 for horizontal (YouTube), 1:1 for square. Default: 9:16",
+          "default": "9:16"
+        },
+        "duration": {
+          "type": "number",
+          "description": "Video duration in seconds (6-10 recommended). Default: 8",
+          "default": 8
+        },
+        "negativePrompt": {
+          "type": "string",
+          "description": "Optional: describe what to avoid in the video"
+        },
+        "referenceImages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional: up to 3 reference images as base64 data URLs for character/product consistency"
+        }
+      },
+      "required": [
+        "prompt"
+      ]
+    }
+  },
+  {
+    "name": "generate_ad",
+    "description": "Generate AI-powered ad copy for social media and digital advertising. Supports Facebook, Instagram, Google Ads, LinkedIn, and Twitter/X with platform-specific templates and character limits. Returns headline, description, CTA, and optional body copy optimized for the selected platform and format.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Ad brief describing what you're advertising, the offer, benefits, and target outcome. Be specific about the product/service, audience, and goal."
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "facebook",
+            "instagram",
+            "google",
+            "linkedin",
+            "twitter"
+          ],
+          "description": "Advertising platform to generate copy for"
+        },
+        "format": {
+          "type": "string",
+          "description": "Ad format (e.g., 'feed', 'story', 'square', 'landscape'). Use list_ad_templates to see available formats per platform."
+        },
+        "targetAudience": {
+          "type": "string",
+          "description": "Optional: Target audience description (e.g., 'small business owners aged 30-50', 'tech-savvy millennials')"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional: Keywords or phrases to include in the ad copy"
+        },
+        "tone": {
+          "type": "string",
+          "enum": [
+            "professional",
+            "casual",
+            "playful",
+            "urgent",
+            "friendly"
+          ],
+          "description": "Optional: Tone of voice for the ad copy. Default: professional"
+        }
+      },
+      "required": [
+        "prompt",
+        "platform",
+        "format"
+      ]
+    }
+  },
+  {
+    "name": "list_ad_templates",
+    "description": "List all available ad templates across all platforms. Returns template details including dimensions, character limits, and format specifications. Use this to discover what ad formats are available before generating ad copy.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "get_ad_templates_by_platform",
+    "description": "Get all ad templates for a specific platform (Facebook, Instagram, Google, LinkedIn, or Twitter). Returns platform-specific format options with dimensions and character limits.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "enum": [
+            "facebook",
+            "instagram",
+            "google",
+            "linkedin",
+            "twitter"
+          ],
+          "description": "Platform to get templates for"
+        }
+      },
+      "required": [
+        "platform"
+      ]
+    }
+  },
+  {
+    "name": "generate_ad_image",
+    "description": "Generate an AI-powered advertising image using Imagen 3. Optimized for each platform's specifications and best practices. Returns a base64-encoded image ready for download and use.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Visual description of the ad image. Be specific about products, setting, mood, colors, and composition."
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "facebook",
+            "instagram",
+            "google",
+            "linkedin",
+            "twitter"
+          ],
+          "description": "Platform the image will be used on (affects optimization)"
+        },
+        "format": {
+          "type": "string",
+          "description": "Ad format (e.g., 'feed', 'story', 'square'). Use list_ad_templates to see available formats."
+        },
+        "aspectRatio": {
+          "type": "string",
+          "enum": [
+            "1:1",
+            "16:9",
+            "9:16",
+            "4:5",
+            "1.91:1"
+          ],
+          "description": "Optional: Aspect ratio for the image. Auto-detected from template if not provided."
+        }
+      },
+      "required": [
+        "prompt"
+      ]
+    }
+  },
+  {
+    "name": "generate_ad_video",
+    "description": "Generate an AI-powered advertising video using Veo. Perfect for Instagram Stories, TikTok ads, YouTube pre-roll, and social media video ads. Returns an operation ID to track video generation progress (videos take 2-5 minutes to generate).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Video description including action, setting, mood, and key visual elements. Be detailed about camera movement, transitions, and narrative."
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "facebook",
+            "instagram",
+            "google",
+            "linkedin",
+            "twitter",
+            "tiktok",
+            "youtube"
+          ],
+          "description": "Platform the video will be used on"
+        },
+        "format": {
+          "type": "string",
+          "description": "Ad format (e.g., 'story', 'feed', 'reels')"
+        },
+        "aspectRatio": {
+          "type": "string",
+          "enum": [
+            "9:16",
+            "16:9",
+            "1:1"
+          ],
+          "description": "Video aspect ratio. Default: '9:16' (vertical)",
+          "default": "9:16"
+        },
+        "duration": {
+          "type": "number",
+          "description": "Video duration in seconds (6-10 seconds recommended for ads). Default: 6",
+          "default": 6
+        }
+      },
+      "required": [
+        "prompt"
+      ]
+    }
+  },
+  {
+    "name": "generate_complete_ad",
+    "description": "Generate a complete ad package: copy (headline, description, CTA) + image + optional video. This is the fastest way to create a ready-to-use ad campaign. Returns all assets together.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Complete ad brief describing what you're advertising, target audience, key message, and desired visual style."
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "facebook",
+            "instagram",
+            "google",
+            "linkedin",
+            "twitter"
+          ],
+          "description": "Advertising platform"
+        },
+        "format": {
+          "type": "string",
+          "description": "Ad format (e.g., 'feed', 'story', 'square'). Use list_ad_templates to see options."
+        },
+        "targetAudience": {
+          "type": "string",
+          "description": "Optional: Target audience description for copy optimization"
+        },
+        "tone": {
+          "type": "string",
+          "enum": [
+            "professional",
+            "casual",
+            "playful",
+            "urgent",
+            "friendly"
+          ],
+          "description": "Optional: Tone of voice for ad copy"
+        },
+        "includeImage": {
+          "type": "boolean",
+          "description": "Generate ad image (default: true)",
+          "default": true
+        },
+        "includeVideo": {
+          "type": "boolean",
+          "description": "Generate ad video (default: false, adds ~3min generation time)",
+          "default": false
+        }
+      },
+      "required": [
+        "prompt",
+        "platform",
+        "format"
+      ]
+    }
+  }
+]
