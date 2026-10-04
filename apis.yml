@@ -15,6 +15,21 @@ description: >-
   signed cards, an Agentic Resource Discovery catalog, llms.txt, an installable skill.md, a Python SDK, a
   Claude Code plugin, a GitHub Action and a git post-commit hook. There is no OpenAPI.
 url: https://raw.githubusercontent.com/api-evangelist/deusproof-com/refs/heads/main/apis.yml
+deliveryModel:
+  model: saas
+  license_evidence:
+    not_product:
+    - abracadabrastartup/deusproof-mcp
+  open_source: unknown
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: low
+  source:
+  - pricing
+  - repository-not-product
+  generated: '2026-09-25'
+  method: derived
 image: https://deusproof.com/icons/icon-512.png
 x-type: company
 x-source: harvest:a2a-registry
@@ -35,7 +50,7 @@ tags:
 - x402
 - Decentralized Identity
 - Content Authenticity
-- agent-native
+- Agent-Native
 - United States
 tags_raw:
 - Agents
@@ -51,6 +66,7 @@ tags_raw:
 - Content authenticity
 - Agent-native
 - United States
+- agent-native
 apis:
 - aid: deusproof-com:deusproof-notary-api
   name: DEUSPROOF Notary API
@@ -113,6 +129,10 @@ apis:
   baseURL: https://deusproof.com/mcp
   tags:
   - MCP
+  - Agent-Native
+  - Provenance
+  tags_raw:
+  - MCP
   - agent-native
   - Provenance
   properties:
@@ -148,6 +168,10 @@ apis:
   humanURL: https://deusproof.com/skill.md
   baseURL: https://deusproof.com/a2a/jsonrpc
   tags:
+  - A2A
+  - Agent-Native
+  - Provenance
+  tags_raw:
   - A2A
   - agent-native
   - Provenance
@@ -255,3 +279,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 28
   pass: local-v3
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://deusproof.com/.well-known/agent-card.json"
+  grade: "flavored"
+  protocol_version: "1.0"
+  control: 404
