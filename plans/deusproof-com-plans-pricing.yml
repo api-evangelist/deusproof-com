@@ -64,3 +64,25 @@ plans:
     referral minimum is 5 USDC; the live x402 document says 0.5 — the live document is recorded as
     authoritative because skill.md itself says to read it. The 402 challenge on the paid route was not
     exercised (it is a write).
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - metered
+  - subscription
+  units: []
+  plans:
+  - name: Free (public beta)
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods:
+    - other
+  - name: Testamentum (one-time notarial act)
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods:
+    - other
