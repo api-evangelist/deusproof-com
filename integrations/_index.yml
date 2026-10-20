@@ -19,6 +19,53 @@
     registered_name: io.github.Abracadabrastartup/deusproof-mcp
     register_id: io.github.Abracadabrastartup/deusproof-mcp
     detected_by: sweep-agent-tools.py
-    detected: '2026-10-15'
+    detected: '2026-10-19'
+  status: not-a-workflow
+  arazzo: null
+- slug: deusproof-com-a2a-protocol-own-agent-card
+  label: A2A protocol (own Agent Card)
+  partner_name: A2A protocol (own Agent Card)
+  category: A2A agent
+  type: register
+  channel: provider-built
+  evidence: https://deusproof.com/.well-known/agent-card.json
+  source: edge
+  relationship: compatible
+  contract_reference:
+    register: provider's own /.well-known/agent-card.json
+    spec_file: null
+    standard: A2A
+    role: a2a-agent-card
+    registered_name: DEUSPROOF
+    organization: DEUSPROOF
+    matched_domain: deusproof.com
+    matched_by: own-domain
+    detected_by: sweep-ai-agents.py
+    detected: '2026-10-19'
+  status: not-a-workflow
+  arazzo: null
+- slug: deusproof-com-a2aregistry-org
+  label: a2aregistry.org
+  partner_name: a2aregistry.org
+  category: A2A agent registry
+  type: register
+  channel: standard-directory
+  evidence: https://a2aregistry.org/api/agents/1b69cc37-1f6c-4482-86e5-7d5c33b0cf67
+  source: edge
+  relationship: compatible
+  contract_reference:
+    register: a2aregistry.org /api/agents
+    spec_file: null
+    standard: A2A
+    role: a2a-registry-listing
+    registered_name: DEUSPROOF
+    matched_domain: deusproof.com
+    matched_by: domain
+    matched_via: card-host
+    listings_context: 1
+    sample_agents:
+    - DEUSPROOF
+    detected_by: sweep-ai-agents.py
+    detected: '2026-10-19'
   status: not-a-workflow
   arazzo: null
