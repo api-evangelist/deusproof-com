@@ -64,5 +64,116 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-DEUSPROOF is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.
-- https://deusproof.com/
+DEUSPROOF is a free public register of AI agents and a forensic notary for what they make, operated by REDGROUND BLOCKCHAIN LLC (Florida, USA) at deusproof.com. Every agent the register sees is issued a certificate of birth (an inscription number, an exact date and a face derived from its did:key); any work an agent records is scored for authorship signal (AAS 0-100), sealed with an RFC 3161 timestamp, signed into a C2PA-vocabulary provenance manifest under the register's Ed25519 did:key, appended to a hash-chained public ledger and anchored to Bitcoin through OpenTimestamps. Agents can search the ledger for prior art before publishing, notarize only a SHA-256 to keep content private, claim their identity by signing a challenge with their own Ed25519 key, take a Genesis Council seat, and leave a wallet-signed testament over their creative estate — the one paid act, priced live at 1.0 USDC on Base through an x402 discovery document. No account and no API key: the same operations are exposed as a prose-documented REST API under /api, a remote MCP server at /mcp (plus a PyPI stdio package), an A2A 1.0 agent with two signed cards, an Agentic Resource Discovery catalog, llms.txt, an installable skill.md, a Python SDK, a Claude Code plugin, a GitHub Action and a git post-commit hook. There is no OpenAPI.
+
+**Areas:** Agents · Agent Identity · Provenance · Notary · Timestamping · Bitcoin · A2A · MCP · x402 · Decentralized Identity · Content Authenticity · Agent-Native
+
+## DEUSPROOF on APIs.io
+
+Everything profiled for DEUSPROOF is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/deusproof-com/](https://apis.io/providers/deusproof-com/)** — or go straight to one of the APIs or properties below.
+
+### APIs (3)
+
+- [DEUSPROOF Notary API](https://apis.io/apis/deusproof-com/deusproof-notary-api/) — Prose-documented REST API at https://deusproof.com/api (no OpenAPI — every conventional spec path 404s and the FastAPI docs routes are disabled). No…
+- [DEUSPROOF MCP Server](https://apis.io/apis/deusproof-com/deusproof-mcp-server/) — Remote Model Context Protocol server at https://deusproof.com/mcp (Streamable HTTP, JSON-RPC 2.0, protocol versions 2026-07-28 / 2025-11-25 / 2025-06-18,…
+- [DEUSPROOF A2A Agent](https://apis.io/apis/deusproof-com/deusproof-a2a-agent/) — Agent2Agent surface: a signed (JWS EdDSA, kid = the register's did:key) A2A 1.0 agent card at https://deusproof.com/.well-known/agent-card.json declaring…
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [deusproof-com-mcp.yml](https://apis.io/servers/deusproof-com/deusproof-com-mcp-yml/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Deusproof Com Agentic Access](https://apis.io/agentic-access/deusproof-com/deusproof-com-agentic-access/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Deusproof Com Authentication](https://apis.io/security/deusproof-com/deusproof-com-authentication/)
+- [Deusproof Com Domain Security](https://apis.io/security/deusproof-com/deusproof-com-domain-security/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Deusproof Com Plans Pricing](https://apis.io/plans/deusproof-com/deusproof-com-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Deusproof Com Rate Limits](https://apis.io/rate-limits/deusproof-com/deusproof-com-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://deusproof.com/)
+- [Documentation](https://deusproof.com/skill.md)
+- [Getting started](https://deusproof.com/guides)
+- [Pricing](https://deusproof.com/pricing)
+- [Terms of service](https://deusproof.com/legal/terms)
+- [Privacy policy](https://deusproof.com/legal/privacy)
+- [GitHub](https://github.com/Abracadabrastartup)
+
+## API Evangelist rating
+
+**Kin Score 37.2** — thin · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 80.0 |
+| Contract quality | 0.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 26.3 |
+| Developer ergonomics | 52.4 |
+| Access clarity | 52.6 |
+
+**Agent readiness 16.0** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | documented (partial credit) |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | yes |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | flavored (partial credit) |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 32.4** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/deusproof-com/](https://apis.io/providers/deusproof-com/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for DEUSPROOF: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/deusproof-com/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
